@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Report Sales Harian</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f7;font-family:Arial,sans-serif;color:#222}
+header{background:#d71920;color:#fff;padding:16px;font-size:21px;font-weight:700}
+.wrap{max-width:1050px;margin:auto;padding:14px}.panel{background:#fff;border-radius:12px;padding:15px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
+h2{font-size:18px;margin:0 0 12px;color:#d71920}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+label{font-size:12px;color:#666;display:block;margin-bottom:5px}input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px}
+table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;font-size:13px}th{background:#fafafa;text-align:left}td input{padding:7px}
+.num{text-align:right}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.card{padding:13px;background:#fafafa;border-radius:10px}.card small{color:#666}.card b{display:block;font-size:19px;margin-top:5px}
+button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d71920;font-weight:700;cursor:pointer}.green{background:#198754}.dark{background:#555}.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.muted{font-size:12px;color:#777}.report{white-space:pre-wrap;background:#f7f7f7;border-radius:8px;padding:12px;font-size:13px;line-height:1.45}
+@media(max-width:600px){header{font-size:18px}th,td{font-size:12px}}
+</style>
+</head>
+<body>
+<header>📊 REPORT SALES HARIAN</header>
+<div class="wrap">
+
+<div class="panel">
+<h2>Identitas Laporan</h2>
+<div class="grid">
+<div><label>Periode</label><input id="period" type="date"></div>
+<div><label>WH</label><input id="wh" value="Bekasi"></div>
+<div><label>AM</label><input id="am" value="Syahrul"></div>
+<div><label>AC</label><input id="ac" value="Triyanto"></div>
+<div><label>KD Toko</label><input id="storeCode" value="CC21"></div>
+<div><label>Nama Toko</label><input id="storeName" value="KUTN"></div>
+<div><label>Shift</label><input id="shift" value="2"></div>
+</div>
+</div>
+
+<div class="panel">
+<h2>REVENUE</h2>
+<div class="grid">
+<div><label>Time Factor (%) — Otomatis</label><input id="timeFactor" type="text" readonly style="background:#eee"></div>
+<div><label>Target MTD (Rp)</label><input id="targetMTD" type="number" value="345059891"></div>
+<div><label>Target Time Factor (Rp) — Otomatis</label><input id="targetTF" type="text" readonly style="background:#eee"></div>
+<div><label>Actual / Net Sales (Rp)</label><input id="actual" type="number" value="0"></div>
+</div>
+<p class="muted">Time Factor dihitung otomatis berdasarkan tanggal Periode ÷ jumlah hari dalam bulan. Target Time Factor juga otomatis.</p>
+<div class="cards">
+<div class="card"><small>Achieve MTD</small><b id="ach">0%</b></div>
+<div class="card"><small>Achieved Time Factor</small><b id="achTF">0%</b></div>
+<div class="card"><small>Gap to Target</small><b id="gap">Rp0</b></div>
+<div class="card"><small>Gap to Time Factor</small><b id="gapTF">Rp0</b></div>
+</div>
+</div>
+
+<div class="panel">
+<h2>FOKUS CABANG</h2>
+<table><thead><tr><th>Item</th><th>Target</th><th>Sales/Actual</th><th>ACV %</th><th>On Hand</th></tr></thead><tbody id="focus"></tbody></table>
+</div>
+
+<div class="panel">
+<h2>MEMBER</h2>
+<div class="grid">
+<div><label>Actual NEW MEMBER</label><input id="newMember" type="number" value="0"></div>
+<div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="0"></div>
+<div><label>Total Struk</label><input id="totalReceipt" type="number" value="0"></div>
+</div>
+<div class="card" style="margin-top:10px"><small>Kontribusi Struk MEMBER</small><b id="memberPct">0%</b></div>
+</div>
+
+<div class="panel">
+<h2>PSM (In Qty)</h2>
+<table><thead><tr><th>Item</th><th>Target</th><th>Actual</th><th>ACV %</th></tr></thead><tbody id="psm"></tbody></table>
+</div>
+
+<div class="panel">
+<h2>CATEGORY (Rupiah)</h2>
+<div class="grid">
+<div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div>
+<div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div>
+</div>
+</div>
+
+<div class="panel">
+<h2>E-COMMERCE</h2>
+<div><label>FEE BASE (Rp)</label><input id="feeBase" type="number" value="0"></div>
+</div>
+
+<div class="panel">
+<h2>Preview WhatsApp</h2>
+<div id="preview" class="report"></div>
+<div class="actions" style="margin-top:10px">
+<button onclick="copyReport()">📱 Copy ke WhatsApp</button>
+<button class="green" onclick="sendWhatsApp()">💬 Kirim ke WhatsApp</button>
+<button class="dark" onclick="saveData()">💾 Simpan Data</button>
+<button class="dark" onclick="window.print()">🖨️ Cetak / PDF</button>
+</div>
+</div>
+</div>
+
+<script>
+const focusItems=[
+["TEBUS MURAH (QTY REDEEM)",0,0,0],["SERBA GRATIS (PAKET)",12,0,0],
+["SEUUGER",0,0,0],["PROMO CEBAN",0,0,0]
+];
+const psmItems=[["LE MINERAL",185,0],["FF",42,0],["INDOMILK",48,0],["TANGO",81,8],["WONHAE",18,0],["OISHI",4,0],["PANTENE",12,0],["SUNLIGHT",133,0],["ITEM PSM BARU",0,0]];
+const rupiah=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
+const pct=(a,b)=>b?((Number(a)||0)/b*100):0;
+function renderTables(){
+ document.getElementById("focus").innerHTML=focusItems.map((x,i)=>`<tr><td>${x[0]}</td><td><input id="f${i}t" type="number" value="${x[1]}"></td><td><input id="f${i}a" type="number" value="${x[2]}"></td><td id="f${i}p" class="num">0%</td><td><input id="f${i}o" type="number" value="${x[3]}"></td></tr>`).join("");
+ document.getElementById("psm").innerHTML=psmItems.map((x,i)=>`<tr><td><input id="p${i}n" type="text" value="${x[0]}"></td><td><input id="p${i}t" type="number" value="${x[1]}"></td><td><input id="p${i}a" type="number" value="${x[2]}"></td><td id="p${i}p" class="num">0%</td></tr>`).join("");
+}
+function v(id){return Number(document.getElementById(id).value)||0}
+function getTimeFactor(){
+  const val=document.getElementById("period").value;
+  if(!val) return 0;
+  const [y,m,d]=val.split("-").map(Number);
+  const days=new Date(y,m,0).getDate();
+  return d/days*100;
+}
+function calc(){
+ let tf=getTimeFactor(), target=v("targetMTD"), actual=v("actual"), targetTF=target*tf/100;
+ document.getElementById("timeFactor").value=tf.toFixed(2);
+ document.getElementById("targetTF").value=rupiah(targetTF);
+ document.getElementById("ach").textContent=pct(actual,target).toFixed(2)+"%";
+ document.getElementById("achTF").textContent=pct(actual,targetTF).toFixed(2)+"%";
+ document.getElementById("gap").textContent=rupiah(target-actual);
+ document.getElementById("gapTF").textContent=rupiah(targetTF-actual);
+ document.getElementById("memberPct").textContent=pct(v("memberReceipt"),v("totalReceipt")).toFixed(2)+"%";
+ focusItems.forEach((_,i)=>document.getElementById(`f${i}p`).textContent=pct(v(`f${i}a`),v(`f${i}t`)).toFixed(2)+"%");
+ psmItems.forEach((_,i)=>document.getElementById(`p${i}p`).textContent=pct(v(`p${i}a`),v(`p${i}t`)).toFixed(2)+"%");
+ document.getElementById("preview").textContent=makeReport();
+}
+function makeReport(){
+ let tf=getTimeFactor(),target=v("targetMTD"),actual=v("actual"),targetTF=target*tf/100;
+ let d=document.getElementById("period").value; let date=d?new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"long"}):"";
+ let s=`REPORT SALES HARIAN
+PERIODE : ${date}
+WH : ${document.getElementById("wh").value}
+AM : ${document.getElementById("am").value}
+AC : ${document.getElementById("ac").value}
+KD Toko      : ${document.getElementById("storeCode").value}
+Nama Toko : ${document.getElementById("storeName").value}
+Shift : ${document.getElementById("shift").value}
+======================
+
+*REVENUE*
+1. NET SALES
+- Time factor: ${tf.toFixed(2)}%
+- TARGET MTD :${rupiah(target)}
+- Target Time Factor: ${rupiah(targetTF)}
+- ACTUAL :${rupiah(actual)}
+- ACHIVE MTD:${pct(actual,target).toFixed(2)}%
+- AChieved Time Factor :${pct(actual,targetTF).toFixed(2)}%
+- GAP TO TARGET :${rupiah(target-actual)}
+- GAP To Time Factor:${rupiah(targetTF-actual)}
+
+*FOKUS CABANG*
+======================
+TARGET/SALES/ACV%/ON HAND
+`;
+ focusItems.forEach((x,i)=>s+=`\n${i+1}. ${x[0]} :${v(`f${i}t`)}/${v(`f${i}a`)}/${pct(v(`f${i}a`),v(`f${i}t`)).toFixed(0)}%/${v(`f${i}o`)}`);
+ s+=`\n======================
+*MEMBER*
+1. Actual NEW MEMBER :${v("newMember")}
+2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${v("memberReceipt")}/${v("totalReceipt")}/${pct(v("memberReceipt"),v("totalReceipt")).toFixed(0)}%
+======================
+*PSM*(In Qty).
+( Target - actual - %)
+`;
+ psmItems.forEach((x,i)=>s+=`\n${i+1}. ${document.getElementById(`p${i}n`).value} : ${v(`p${i}t`)}/${v(`p${i}a`)}/${pct(v(`p${i}a`),v(`p${i}t`)).toFixed(0)}%`);
+ s+=`\n\n======================
+*CATEGORY* (Rupiah)
+1. TOYS (NS) : ${rupiah(v("toys"))}
+1. HBPL (NS) : ${rupiah(v("hbpl"))}
+======================
+*E-COMMERCE*
+1. FEE BASE (RP) : ${rupiah(v("feeBase"))}
+
+Terimakasih`;
+ return s;
+}
+function copyReport(){calc();navigator.clipboard.writeText(makeReport()).then(()=>alert("Laporan sudah disalin. Tinggal Paste ke WhatsApp."));}
+function sendWhatsApp(){calc();window.open("https://wa.me/?text="+encodeURIComponent(makeReport()),"_blank")}
+function saveData(){
+ let obj={};document.querySelectorAll("input").forEach(x=>obj[x.id]=x.value);
+ localStorage.setItem("reportSalesHarian",JSON.stringify(obj));alert("Data laporan tersimpan di perangkat.");
+}
+function loadData(){
+ let o=JSON.parse(localStorage.getItem("reportSalesHarian")||"null");if(!o)return;
+ Object.keys(o).forEach(k=>{let e=document.getElementById(k);if(e)e.value=o[k]});
+}
+renderTables();
+const now=new Date();
+document.getElementById("period").value=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+loadData();
+document.querySelectorAll("input").forEach(e=>e.addEventListener("input",calc));
+calc();
+</script>
+</body>
+</html>
