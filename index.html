@@ -2,18 +2,59 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Report Sales Harian</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d71920">
+<title>Report Sales Harian CC21</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f7;font-family:Arial,sans-serif;color:#222}
-header{background:#d71920;color:#fff;padding:16px;font-size:21px;font-weight:700}
-.wrap{max-width:1050px;margin:auto;padding:14px}.panel{background:#fff;border-radius:12px;padding:15px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
-h2{font-size:18px;margin:0 0 12px;color:#d71920}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-label{font-size:12px;color:#666;display:block;margin-bottom:5px}input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px}
-table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;font-size:13px}th{background:#fafafa;text-align:left}td input{padding:7px}
-.num{text-align:right}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.card{padding:13px;background:#fafafa;border-radius:10px}.card small{color:#666}.card b{display:block;font-size:19px;margin-top:5px}
-button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d71920;font-weight:700;cursor:pointer}.green{background:#198754}.dark{background:#555}.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.muted{font-size:12px;color:#777}.report{white-space:pre-wrap;background:#f7f7f7;border-radius:8px;padding:12px;font-size:13px;line-height:1.45}
-@media(max-width:600px){header{font-size:18px}th,td{font-size:12px}}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f7;font-family:Arial,sans-serif;color:#222}
+header{background:#d71920;color:#fff;padding:16px;font-size:21px;font-weight:700;position:sticky;top:0;z-index:10}
+.wrap{max-width:1050px;margin:auto;padding:14px}
+.panel{background:#fff;border-radius:12px;padding:15px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
+h2{font-size:18px;margin:0 0 12px;color:#d71920}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+label{font-size:12px;color:#666;display:block;margin-bottom:5px}
+input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px;min-height:42px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #eee;font-size:13px}
+th{background:#fafafa;text-align:left}
+td input{padding:7px;min-height:38px}
+.num{text-align:right}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.card{padding:13px;background:#fafafa;border-radius:10px}
+.card small{color:#666}
+.card b{display:block;font-size:19px;margin-top:5px}
+button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d71920;font-weight:700;cursor:pointer;min-height:44px}
+.green{background:#198754}
+.dark{background:#555}
+.blue{background:#0d6efd}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.muted{font-size:12px;color:#777}
+.report{white-space:pre-wrap;background:#f7f7f7;border-radius:8px;padding:12px;font-size:13px;line-height:1.45}
+.status{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#777}
+.online{background:#198754}
+.offline{background:#dc3545}
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.store-card{border:1px solid #eee;border-radius:10px;padding:12px;background:#fff}
+.store-card b{display:block;margin-bottom:5px}
+.store-card small{color:#666}
+@media(max-width:600px){
+ header{font-size:18px;padding:14px}
+ .wrap{padding:8px}
+ .panel{padding:12px}
+ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+ th,td{font-size:12px}
+ .actions{grid-template-columns:1fr 1fr}
+ .actions button{font-size:12px;padding:10px 7px}
+ .report{font-size:12px}
+}
+@media print{
+ header{position:static}
+ .actions,.status,.dashboard-grid{display:none}
+ body{background:#fff}
+ .panel{box-shadow:none;border:0}
+}
 </style>
 </head>
 <body>
@@ -30,6 +71,10 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 <div><label>KD Toko</label><input id="storeCode" value="CC21"></div>
 <div><label>Nama Toko</label><input id="storeName" value="KUTN"></div>
 <div><label>Shift</label><input id="shift" value="2"></div>
+</div>
+<div class="status">
+<span id="dot" class="dot offline"></span>
+<span id="syncStatus" class="muted">Database online belum dikonfigurasi</span>
 </div>
 </div>
 
@@ -52,7 +97,10 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 
 <div class="panel">
 <h2>FOKUS CABANG</h2>
-<table><thead><tr><th>Item</th><th>Target</th><th>Sales/Actual</th><th>ACV %</th><th>On Hand</th></tr></thead><tbody id="focus"></tbody></table>
+<table>
+<thead><tr><th>Item</th><th>Target</th><th>Sales/Actual</th><th>ACV %</th><th>On Hand</th></tr></thead>
+<tbody id="focus"></tbody>
+</table>
 </div>
 
 <div class="panel">
@@ -62,12 +110,17 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 <div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="0"></div>
 <div><label>Total Struk</label><input id="totalReceipt" type="number" value="0"></div>
 </div>
-<div class="card" style="margin-top:10px"><small>Kontribusi Struk MEMBER</small><b id="memberPct">0%</b></div>
+<div class="card" style="margin-top:10px">
+<small>Kontribusi Struk MEMBER</small><b id="memberPct">0%</b>
+</div>
 </div>
 
 <div class="panel">
 <h2>PSM (In Qty)</h2>
-<table><thead><tr><th>Item</th><th>Target</th><th>Actual</th><th>ACV %</th></tr></thead><tbody id="psm"></tbody></table>
+<table>
+<thead><tr><th>Item</th><th>Target</th><th>Actual</th><th>ACV %</th></tr></thead>
+<tbody id="psm"></tbody>
+</table>
 </div>
 
 <div class="panel">
@@ -93,44 +146,136 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 <button class="dark" onclick="window.print()">🖨️ Cetak / PDF</button>
 </div>
 </div>
+
+<div class="panel">
+<h2>🌐 Monitoring Real-Time</h2>
+<div class="actions">
+<button class="blue" onclick="refreshDashboard()">🔄 Refresh Data Online</button>
+<button class="dark" onclick="loadCloudForCurrentStore()">📥 Ambil Data Toko Ini</button>
+</div>
+<div id="dashboard" class="dashboard-grid" style="margin-top:10px"></div>
+<p class="muted">Data dashboard diambil dari Google Sheets. Halaman melakukan sinkronisasi otomatis setiap 30 detik.</p>
+</div>
+
 </div>
 
 <script>
+/*
+=========================================================
+PENTING:
+Setelah Code.gs selesai di-deploy, isi 2 baris berikut.
+
+API_URL   = URL Web App Apps Script
+API_TOKEN = token hasil setupDatabase()
+
+Contoh:
+const API_URL = "https://script.google.com/macros/s/XXXXX/exec";
+const API_TOKEN = "XXXXX";
+=========================================================
+*/
+const API_URL = "https://script.google.com/macros/s/AKfycbwqCnA-iYLf9x4xY3NC4hBNQROBx8Qe3MRi4tgSWCePU01OCE08ZAA97aUHYz7CP1du/exec";
+const API_TOKEN = "PASTE_TOKEN_DARI_SETUPDATABASE_DI_SINI";
+
 const focusItems=[
-["TEBUS MURAH (QTY REDEEM)",0,0,0],["SERBA GRATIS (PAKET)",12,0,0],
-["SEUUGER",0,0,0],["PROMO CEBAN",0,0,0]
+["TEBUS MURAH (QTY REDEEM)",0,0,0],
+["SERBA GRATIS (PAKET)",12,0,0],
+["SEUUGER",0,0,0],
+["PROMO CEBAN",0,0,0]
 ];
-const psmItems=[["LE MINERAL",185,0],["FF",42,0],["INDOMILK",48,0],["TANGO",81,8],["WONHAE",18,0],["OISHI",4,0],["PANTENE",12,0],["SUNLIGHT",133,0],["ITEM PSM BARU",0,0]];
-const rupiah=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
+
+const psmItems=[
+["LE MINERAL",185,0],
+["FF",42,0],
+["INDOMILK",48,0],
+["TANGO",81,8],
+["WONHAE",18,0],
+["OISHI",4,0],
+["PANTENE",12,0],
+["SUNLIGHT",133,0],
+["ITEM PSM BARU",0,0]
+];
+
+const rupiah=n=>new Intl.NumberFormat("id-ID",{
+style:"currency",
+currency:"IDR",
+maximumFractionDigits:0
+}).format(Number(n)||0);
+
 const pct=(a,b)=>b?((Number(a)||0)/b*100):0;
+
 function renderTables(){
- document.getElementById("focus").innerHTML=focusItems.map((x,i)=>`<tr><td>${x[0]}</td><td><input id="f${i}t" type="number" value="${x[1]}"></td><td><input id="f${i}a" type="number" value="${x[2]}"></td><td id="f${i}p" class="num">0%</td><td><input id="f${i}o" type="number" value="${x[3]}"></td></tr>`).join("");
- document.getElementById("psm").innerHTML=psmItems.map((x,i)=>`<tr><td><input id="p${i}n" type="text" value="${x[0]}"></td><td><input id="p${i}t" type="number" value="${x[1]}"></td><td><input id="p${i}a" type="number" value="${x[2]}"></td><td id="p${i}p" class="num">0%</td></tr>`).join("");
+ document.getElementById("focus").innerHTML=
+ focusItems.map((x,i)=>`
+ <tr>
+ <td>${x[0]}</td>
+ <td><input id="f${i}t" type="number" value="${x[1]}"></td>
+ <td><input id="f${i}a" type="number" value="${x[2]}"></td>
+ <td id="f${i}p" class="num">0%</td>
+ <td><input id="f${i}o" type="number" value="${x[3]}"></td>
+ </tr>`).join("");
+
+ document.getElementById("psm").innerHTML=
+ psmItems.map((x,i)=>`
+ <tr>
+ <td><input id="p${i}n" type="text" value="${x[0]}"></td>
+ <td><input id="p${i}t" type="number" value="${x[1]}"></td>
+ <td><input id="p${i}a" type="number" value="${x[2]}"></td>
+ <td id="p${i}p" class="num">0%</td>
+ </tr>`).join("");
 }
-function v(id){return Number(document.getElementById(id).value)||0}
+
+function v(id){
+ const e=document.getElementById(id);
+ return e ? Number(e.value)||0 : 0;
+}
+
 function getTimeFactor(){
-  const val=document.getElementById("period").value;
-  if(!val) return 0;
-  const [y,m,d]=val.split("-").map(Number);
-  const days=new Date(y,m,0).getDate();
-  return d/days*100;
+ const val=document.getElementById("period").value;
+ if(!val)return 0;
+ const [y,m,d]=val.split("-").map(Number);
+ const days=new Date(y,m,0).getDate();
+ return d/days*100;
 }
+
 function calc(){
- let tf=getTimeFactor(), target=v("targetMTD"), actual=v("actual"), targetTF=target*tf/100;
+ let tf=getTimeFactor();
+ let target=v("targetMTD");
+ let actual=v("actual");
+ let targetTF=target*tf/100;
+
  document.getElementById("timeFactor").value=tf.toFixed(2);
  document.getElementById("targetTF").value=rupiah(targetTF);
  document.getElementById("ach").textContent=pct(actual,target).toFixed(2)+"%";
  document.getElementById("achTF").textContent=pct(actual,targetTF).toFixed(2)+"%";
  document.getElementById("gap").textContent=rupiah(target-actual);
  document.getElementById("gapTF").textContent=rupiah(targetTF-actual);
- document.getElementById("memberPct").textContent=pct(v("memberReceipt"),v("totalReceipt")).toFixed(2)+"%";
- focusItems.forEach((_,i)=>document.getElementById(`f${i}p`).textContent=pct(v(`f${i}a`),v(`f${i}t`)).toFixed(2)+"%");
- psmItems.forEach((_,i)=>document.getElementById(`p${i}p`).textContent=pct(v(`p${i}a`),v(`p${i}t`)).toFixed(2)+"%");
+
+ document.getElementById("memberPct").textContent=
+ pct(v("memberReceipt"),v("totalReceipt")).toFixed(2)+"%";
+
+ focusItems.forEach((_,i)=>{
+  document.getElementById(`f${i}p`).textContent=
+  pct(v(`f${i}a`),v(`f${i}t`)).toFixed(2)+"%";
+ });
+
+ psmItems.forEach((_,i)=>{
+  document.getElementById(`p${i}p`).textContent=
+  pct(v(`p${i}a`),v(`p${i}t`)).toFixed(2)+"%";
+ });
+
  document.getElementById("preview").textContent=makeReport();
 }
+
 function makeReport(){
- let tf=getTimeFactor(),target=v("targetMTD"),actual=v("actual"),targetTF=target*tf/100;
- let d=document.getElementById("period").value; let date=d?new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"long"}):"";
+ let tf=getTimeFactor();
+ let target=v("targetMTD");
+ let actual=v("actual");
+ let targetTF=target*tf/100;
+
+ let d=document.getElementById("period").value;
+ let date=d?new Date(d+"T00:00:00").toLocaleDateString(
+ "id-ID",{day:"numeric",month:"long"}):"";
+
  let s=`REPORT SALES HARIAN
 PERIODE : ${date}
 WH : ${document.getElementById("wh").value}
@@ -156,7 +301,11 @@ Shift : ${document.getElementById("shift").value}
 ======================
 TARGET/SALES/ACV%/ON HAND
 `;
- focusItems.forEach((x,i)=>s+=`\n${i+1}. ${x[0]} :${v(`f${i}t`)}/${v(`f${i}a`)}/${pct(v(`f${i}a`),v(`f${i}t`)).toFixed(0)}%/${v(`f${i}o`)}`);
+
+ focusItems.forEach((x,i)=>{
+  s+=`\n${i+1}. ${x[0]} :${v(`f${i}t`)}/${v(`f${i}a`)}/${pct(v(`f${i}a`),v(`f${i}t`)).toFixed(0)}%/${v(`f${i}o`)}`;
+ });
+
  s+=`\n======================
 *MEMBER*
 1. Actual NEW MEMBER :${v("newMember")}
@@ -165,7 +314,11 @@ TARGET/SALES/ACV%/ON HAND
 *PSM*(In Qty).
 ( Target - actual - %)
 `;
- psmItems.forEach((x,i)=>s+=`\n${i+1}. ${document.getElementById(`p${i}n`).value} : ${v(`p${i}t`)}/${v(`p${i}a`)}/${pct(v(`p${i}a`),v(`p${i}t`)).toFixed(0)}%`);
+
+ psmItems.forEach((x,i)=>{
+  s+=`\n${i+1}. ${document.getElementById(`p${i}n`).value} : ${v(`p${i}t`)}/${v(`p${i}a`)}/${pct(v(`p${i}a`),v(`p${i}t`)).toFixed(0)}%`;
+ });
+
  s+=`\n\n======================
 *CATEGORY* (Rupiah)
 1. TOYS (NS) : ${rupiah(v("toys"))}
@@ -175,24 +328,327 @@ TARGET/SALES/ACV%/ON HAND
 1. FEE BASE (RP) : ${rupiah(v("feeBase"))}
 
 Terimakasih`;
+
  return s;
 }
-function copyReport(){calc();navigator.clipboard.writeText(makeReport()).then(()=>alert("Laporan sudah disalin. Tinggal Paste ke WhatsApp."));}
-function sendWhatsApp(){calc();window.open("https://wa.me/?text="+encodeURIComponent(makeReport()),"_blank")}
+
+function collectData(){
+ calc();
+
+ const o={};
+
+ document.querySelectorAll("input").forEach(x=>{
+  o[x.id]=x.value;
+ });
+
+ let id=localStorage.getItem("cc21_report_id");
+
+ if(!id){
+  id=(window.crypto&&crypto.randomUUID)
+   ? crypto.randomUUID()
+   : String(Date.now())+"-"+Math.random().toString(36).slice(2);
+ }
+
+ o.id=id;
+
+ o.timeFactor=getTimeFactor();
+ o.targetTF=v("targetMTD")*o.timeFactor/100;
+ o.achieve=pct(v("actual"),v("targetMTD"));
+ o.achTF=pct(v("actual"),o.targetTF);
+ o.gap=v("targetMTD")-v("actual");
+ o.gapTF=o.targetTF-v("actual");
+ o.memberPct=pct(v("memberReceipt"),v("totalReceipt"));
+
+ o.focus=focusItems.map((x,i)=>({
+  item:x[0],
+  target:v(`f${i}t`),
+  actual:v(`f${i}a`),
+  acv:pct(v(`f${i}a`),v(`f${i}t`)),
+  onHand:v(`f${i}o`)
+ }));
+
+ o.psm=psmItems.map((x,i)=>({
+  item:document.getElementById(`p${i}n`).value,
+  target:v(`p${i}t`),
+  actual:v(`p${i}a`),
+  acv:pct(v(`p${i}a`),v(`p${i}t`))
+ }));
+
+ return o;
+}
+
+function saveLocal(o){
+ localStorage.setItem("cc21_report_data",JSON.stringify(o));
+ localStorage.setItem("cc21_report_id",o.id);
+}
+
+/* Mantém a função antiga, mas agora salva online */
 function saveData(){
- let obj={};document.querySelectorAll("input").forEach(x=>obj[x.id]=x.value);
- localStorage.setItem("reportSalesHarian",JSON.stringify(obj));alert("Data laporan tersimpan di perangkat.");
+ const o=collectData();
+ saveLocal(o);
+
+ if(!configured()){
+  setStatus("Data lokal tersimpan • database belum dikonfigurasi",false);
+  alert("Data tersimpan di perangkat. Hubungkan Apps Script agar tersimpan online.");
+  return;
+ }
+
+ setStatus("Menyimpan ke Google Sheets...",false);
+
+ jsonp("save",{data:JSON.stringify(o)},res=>{
+  if(res.ok){
+   setStatus(
+    "🟢 Tersimpan online • "+
+    new Date().toLocaleTimeString("id-ID"),true
+   );
+   alert("Data berhasil disimpan ke Google Sheets.");
+   refreshDashboard();
+  }else{
+   setStatus("🔴 Gagal online: "+res.error,false);
+   alert(res.error||"Gagal menyimpan online.");
+  }
+ });
 }
-function loadData(){
- let o=JSON.parse(localStorage.getItem("reportSalesHarian")||"null");if(!o)return;
- Object.keys(o).forEach(k=>{let e=document.getElementById(k);if(e)e.value=o[k]});
+
+function copyReport(){
+ calc();
+
+ navigator.clipboard.writeText(makeReport())
+ .then(()=>{
+  alert("Laporan sudah disalin. Tinggal Paste ke WhatsApp.");
+ })
+ .catch(()=>{
+  alert("Browser tidak mengizinkan Copy otomatis. Silakan salin Preview secara manual.");
+ });
 }
+
+function sendWhatsApp(){
+ calc();
+ window.open(
+  "https://wa.me/?text="+encodeURIComponent(makeReport()),
+  "_blank"
+ );
+}
+
+function loadLocal(){
+ const o=JSON.parse(
+  localStorage.getItem("cc21_report_data")||"null"
+ );
+
+ if(!o)return;
+
+ Object.keys(o).forEach(k=>{
+  const e=document.getElementById(k);
+  if(e && typeof o[k]!=="object")e.value=o[k];
+ });
+}
+
+function configured(){
+ return API_URL.startsWith("http") &&
+ !API_URL.includes("PASTE_") &&
+ API_TOKEN &&
+ !API_TOKEN.includes("PASTE_");
+}
+
+function setStatus(text,on){
+ document.getElementById("syncStatus").textContent=text;
+ document.getElementById("dot").className="dot "+(on?"online":"offline");
+}
+
+/*
+ JSONP dipakai agar GitHub Pages HTTPS dapat membaca Apps Script
+ tanpa masalah CORS browser.
+*/
+function jsonp(action,params,cb){
+ if(!configured()){
+  cb({ok:false,error:"API belum dikonfigurasi"});
+  return;
+ }
+
+ const name=
+ "cc21cb_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+
+ let finished=false;
+
+ window[name]=function(data){
+  if(finished)return;
+  finished=true;
+
+  try{
+   cb(data);
+  }finally{
+   delete window[name];
+   if(script.parentNode)script.parentNode.removeChild(script);
+  }
+ };
+
+ const script=document.createElement("script");
+
+ const q=new URLSearchParams({
+  action:action,
+  token:API_TOKEN,
+  callback:name,
+  ...params
+ });
+
+ script.src=API_URL+"?"+q.toString();
+
+ script.onerror=function(){
+  if(finished)return;
+  finished=true;
+  delete window[name];
+  if(script.parentNode)script.parentNode.removeChild(script);
+  cb({ok:false,error:"Tidak dapat terhubung ke Apps Script."});
+ };
+
+ document.body.appendChild(script);
+}
+
+function refreshDashboard(){
+ if(!configured()){
+  setStatus("Database online belum dikonfigurasi",false);
+  return;
+ }
+
+ const period=document.getElementById("period").value;
+
+ jsonp("list",{period:period},res=>{
+  if(!res.ok){
+   setStatus("🔴 "+res.error,false);
+   return;
+  }
+
+  setStatus(
+   "🟢 Online • update "+
+   new Date().toLocaleTimeString("id-ID"),true
+  );
+
+  const arr=res.reports||[];
+  const dash=document.getElementById("dashboard");
+
+  if(!arr.length){
+   dash.innerHTML=
+   '<div class="muted">Belum ada laporan online untuk periode ini.</div>';
+   return;
+  }
+
+  dash.innerHTML=
+  arr.slice()
+  .sort((a,b)=>String(a.storeCode).localeCompare(String(b.storeCode)))
+  .map(r=>`
+   <div class="store-card">
+    <small>${r.timestamp?new Date(r.timestamp).toLocaleTimeString("id-ID"):""}</small>
+    <b>${escapeHtml(r.storeCode)} — ${escapeHtml(r.storeName)}</b>
+    <span>Actual: ${rupiah(r.actual)}</span><br>
+    <span>Achieve: ${Number(r.achieve||0).toFixed(2)}%</span>
+   </div>
+  `).join("");
+ });
+}
+
+function loadCloudForCurrentStore(){
+ if(!configured()){
+  alert("API belum dikonfigurasi.");
+  return;
+ }
+
+ const period=document.getElementById("period").value;
+ const code=document.getElementById("storeCode").value;
+ const shift=document.getElementById("shift").value;
+
+ jsonp("list",{period:period},res=>{
+  if(!res.ok){
+   alert(res.error||"Gagal mengambil data.");
+   return;
+  }
+
+  const r=(res.reports||[]).find(x=>
+   x.storeCode===code && x.shift===shift
+  );
+
+  if(!r){
+   alert("Belum ada data online untuk toko dan shift ini.");
+   return;
+  }
+
+  const fields=[
+   "period","wh","am","ac","storeCode","storeName","shift",
+   "targetMTD","actual","newMember","memberReceipt","totalReceipt",
+   "toys","hbpl","feeBase"
+  ];
+
+  fields.forEach(k=>{
+   const e=document.getElementById(k);
+   if(e && r[k]!==undefined)e.value=r[k];
+  });
+
+  (r.focus||[]).forEach((x,i)=>{
+   const map={
+    target:`f${i}t`,
+    actual:`f${i}a`,
+    onHand:`f${i}o`
+   };
+
+   Object.keys(map).forEach(k=>{
+    const e=document.getElementById(map[k]);
+    if(e)e.value=x[k]||0;
+   });
+  });
+
+  (r.psm||[]).forEach((x,i)=>{
+   const map={
+    item:`p${i}n`,
+    target:`p${i}t`,
+    actual:`p${i}a`
+   };
+
+   Object.keys(map).forEach(k=>{
+    const e=document.getElementById(map[k]);
+    if(e)e.value=x[k]??0;
+   });
+  });
+
+  saveLocal(collectData());
+  calc();
+
+  alert("Data online berhasil dimuat.");
+ });
+}
+
+function escapeHtml(s){
+ return String(s??"").replace(
+  /[&<>"']/g,
+  m=>({
+   "&":"&amp;",
+   "<":"&lt;",
+   ">":"&gt;",
+   '"':"&quot;",
+   "'":"&#39;"
+  }[m])
+ );
+}
+
+/* Inisialisasi */
 renderTables();
+
 const now=new Date();
-document.getElementById("period").value=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
-loadData();
-document.querySelectorAll("input").forEach(e=>e.addEventListener("input",calc));
+
+document.getElementById("period").value=
+ now.getFullYear()+"-"+
+ String(now.getMonth()+1).padStart(2,"0")+"-"+
+ String(now.getDate()).padStart(2,"0");
+
+loadLocal();
+
+document.querySelectorAll("input")
+.forEach(e=>e.addEventListener("input",calc));
+
 calc();
+
+if(configured()){
+ refreshDashboard();
+ setInterval(refreshDashboard,30000);
+}
 </script>
 </body>
 </html>
