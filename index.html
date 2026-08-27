@@ -14,7 +14,7 @@ header{background:#d71920;color:#fff;padding:16px;font-size:21px;font-weight:700
 h2{font-size:18px;margin:0 0 12px;color:#d71920}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 label{font-size:12px;color:#666;display:block;margin-bottom:5px}
-input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px;min-height:42px}
+input,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px;min-height:42px}
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px;border-bottom:1px solid #eee;font-size:13px}
 th{background:#fafafa;text-align:left}
@@ -39,26 +39,31 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 .store-card{border:1px solid #eee;border-radius:10px;padding:12px;background:#fff}
 .store-card b{display:block;margin-bottom:5px}
 .store-card small{color:#666}
-@media(max-width:600px){
- header{font-size:18px;padding:14px}
- .wrap{padding:8px}
- .panel{padding:12px}
- table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
- th,td{font-size:12px}
- .actions{grid-template-columns:1fr 1fr}
- .actions button{font-size:12px;padding:10px 7px}
- .report{font-size:12px}
-}
-@media print{
- header{position:static}
- .actions,.status,.dashboard-grid{display:none}
- body{background:#fff}
- .panel{box-shadow:none;border:0}
-}
+.login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:#d71920;display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{background:#fff;padding:25px;border-radius:12px;width:90%;max-width:350px;text-align:center}
+.login-box h2{color:#d71920;margin-bottom:15px}
 </style>
 </head>
 <body>
-<header>📊 REPORT SALES HARIAN</header>
+
+<!-- LAYAR LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h2>📊 Login Sales CC21</h2>
+    <select id="salesName">
+      <option value="">Pilih Nama Anda</option>
+      <option value="Budi">Budi</option>
+      <option value="Siti">Siti</option>
+      <option value="Andi">Andi</option>
+      <option value="Rina">Rina</option>
+      <option value="Joko">Joko</option>
+    </select>
+    <button class="green" onclick="login()" style="margin-top:10px;width:100%">MASUK</button>
+    <p class="muted" style="margin-top:10px">Nama akan tersimpan otomatis</p>
+  </div>
+</div>
+
+<header>📊 REPORT SALES HARIAN <span id="headerSales" style="font-size:14px;font-weight:400"></span></header>
 <div class="wrap">
 
 <div class="panel">
@@ -71,6 +76,7 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 <div><label>KD Toko</label><input id="storeCode" value="CC21"></div>
 <div><label>Nama Toko</label><input id="storeName" value="KUTN"></div>
 <div><label>Shift</label><input id="shift" value="2"></div>
+<div><label>Nama Sales</label><input id="namaSales" readonly style="background:#eee"></div>
 </div>
 <div class="status">
 <span id="dot" class="dot offline"></span>
@@ -144,6 +150,7 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 <button class="green" onclick="sendWhatsApp()">💬 Kirim ke WhatsApp</button>
 <button class="dark" onclick="saveData()">💾 Simpan Data</button>
 <button class="dark" onclick="window.print()">🖨️ Cetak / PDF</button>
+<button class="blue" onclick="logout()">🚪 Ganti User</button>
 </div>
 </div>
 
@@ -160,19 +167,6 @@ button{border:0;border-radius:8px;padding:11px 13px;color:#fff;background:#d7192
 </div>
 
 <script>
-/*
-=========================================================
-PENTING:
-Setelah Code.gs selesai di-deploy, isi 2 baris berikut.
-
-API_URL   = URL Web App Apps Script
-API_TOKEN = token hasil setupDatabase()
-
-Contoh:
-const API_URL = "https://script.google.com/macros/s/XXXXX/exec";
-const API_TOKEN = "XXXXX";
-=========================================================
-*/
 const API_URL = "https://script.google.com/macros/s/AKfycbwqCnA-iYLf9x4xY3NC4hBNQROBx8Qe3MRi4tgSWCePU01OCE08ZAA97aUHYz7CP1du/exec";
 const API_TOKEN = "bc318b0a8cb4498dba48b232e8f6a461";
 
@@ -195,96 +189,67 @@ const psmItems=[
 ["ITEM PSM BARU",0,0]
 ];
 
-const rupiah=n=>new Intl.NumberFormat("id-ID",{
-style:"currency",
-currency:"IDR",
-maximumFractionDigits:0
-}).format(Number(n)||0);
-
+const rupiah=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
 const pct=(a,b)=>b?((Number(a)||0)/b*100):0;
 
+// LOGIN SYSTEM
+function login(){
+  const name = document.getElementById('salesName').value;
+  if(!name){ alert('Pilih nama dulu'); return; }
+  localStorage.setItem('cc21_sales_name', name);
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('namaSales').value = name;
+  document.getElementById('headerSales').textContent = ' - ' + name;
+}
+
+function logout(){
+  localStorage.removeItem('cc21_sales_name');
+  location.reload();
+}
+
+function checkLogin(){
+  const name = localStorage.getItem('cc21_sales_name');
+  if(name){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('namaSales').value = name;
+    document.getElementById('headerSales').textContent = ' - ' + name;
+  }
+}
+
 function renderTables(){
- document.getElementById("focus").innerHTML=
- focusItems.map((x,i)=>`
- <tr>
- <td>${x[0]}</td>
- <td><input id="f${i}t" type="number" value="${x[1]}"></td>
- <td><input id="f${i}a" type="number" value="${x[2]}"></td>
- <td id="f${i}p" class="num">0%</td>
- <td><input id="f${i}o" type="number" value="${x[3]}"></td>
- </tr>`).join("");
-
- document.getElementById("psm").innerHTML=
- psmItems.map((x,i)=>`
- <tr>
- <td><input id="p${i}n" type="text" value="${x[0]}"></td>
- <td><input id="p${i}t" type="number" value="${x[1]}"></td>
- <td><input id="p${i}a" type="number" value="${x[2]}"></td>
- <td id="p${i}p" class="num">0%</td>
- </tr>`).join("");
+ document.getElementById("focus").innerHTML= focusItems.map((x,i)=>`<tr><td>${x[0]}</td><td><input id="f${i}t" type="number" value="${x[1]}"></td><td><input id="f${i}a" type="number" value="${x[2]}"></td><td id="f${i}p" class="num">0%</td><td><input id="f${i}o" type="number" value="${x[3]}"></td></tr>`).join("");
+ document.getElementById("psm").innerHTML= psmItems.map((x,i)=>`<tr><td><input id="p${i}n" type="text" value="${x[0]}"></td><td><input id="p${i}t" type="number" value="${x[1]}"></td><td><input id="p${i}a" type="number" value="${x[2]}"></td><td id="p${i}p" class="num">0%</td></tr>`).join("");
 }
 
-function v(id){
- const e=document.getElementById(id);
- return e ? Number(e.value)||0 : 0;
-}
-
-function getTimeFactor(){
- const val=document.getElementById("period").value;
- if(!val)return 0;
- const [y,m,d]=val.split("-").map(Number);
- const days=new Date(y,m,0).getDate();
- return d/days*100;
-}
+function v(id){ const e=document.getElementById(id); return e? Number(e.value)||0 : 0; }
+function getTimeFactor(){ const val=document.getElementById("period").value; if(!val)return 0; const [y,m,d]=val.split("-").map(Number); const days=new Date(y,m,0).getDate(); return d/days*100; }
 
 function calc(){
- let tf=getTimeFactor();
- let target=v("targetMTD");
- let actual=v("actual");
- let targetTF=target*tf/100;
-
+ let tf=getTimeFactor(); let target=v("targetMTD"); let actual=v("actual"); let targetTF=target*tf/100;
  document.getElementById("timeFactor").value=tf.toFixed(2);
  document.getElementById("targetTF").value=rupiah(targetTF);
  document.getElementById("ach").textContent=pct(actual,target).toFixed(2)+"%";
  document.getElementById("achTF").textContent=pct(actual,targetTF).toFixed(2)+"%";
  document.getElementById("gap").textContent=rupiah(target-actual);
  document.getElementById("gapTF").textContent=rupiah(targetTF-actual);
-
- document.getElementById("memberPct").textContent=
- pct(v("memberReceipt"),v("totalReceipt")).toFixed(2)+"%";
-
- focusItems.forEach((_,i)=>{
-  document.getElementById(`f${i}p`).textContent=
-  pct(v(`f${i}a`),v(`f${i}t`)).toFixed(2)+"%";
- });
-
- psmItems.forEach((_,i)=>{
-  document.getElementById(`p${i}p`).textContent=
-  pct(v(`p${i}a`),v(`p${i}t`)).toFixed(2)+"%";
- });
-
+ document.getElementById("memberPct").textContent= pct(v("memberReceipt"),v("totalReceipt")).toFixed(2)+"%";
+ focusItems.forEach((_,i)=>{ document.getElementById(`f${i}p`).textContent= pct(v(`f${i}a`),v(`f${i}t`)).toFixed(2)+"%"; });
+ psmItems.forEach((_,i)=>{ document.getElementById(`p${i}p`).textContent= pct(v(`p${i}a`),v(`p${i}t`)).toFixed(2)+"%"; });
  document.getElementById("preview").textContent=makeReport();
 }
 
 function makeReport(){
- let tf=getTimeFactor();
- let target=v("targetMTD");
- let actual=v("actual");
- let targetTF=target*tf/100;
-
- let d=document.getElementById("period").value;
- let date=d?new Date(d+"T00:00:00").toLocaleDateString(
- "id-ID",{day:"numeric",month:"long"}):"";
-
+ let tf=getTimeFactor(); let target=v("targetMTD"); let actual=v("actual"); let targetTF=target*tf/100;
+ let d=document.getElementById("period").value; let date=d?new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"long"}):"";
  let s=`REPORT SALES HARIAN
+SALES : ${document.getElementById("namaSales").value}
 PERIODE : ${date}
 WH : ${document.getElementById("wh").value}
 AM : ${document.getElementById("am").value}
 AC : ${document.getElementById("ac").value}
-KD Toko      : ${document.getElementById("storeCode").value}
+KD Toko : ${document.getElementById("storeCode").value}
 Nama Toko : ${document.getElementById("storeName").value}
 Shift : ${document.getElementById("shift").value}
-======================
 
 *REVENUE*
 1. NET SALES
@@ -296,359 +261,88 @@ Shift : ${document.getElementById("shift").value}
 - AChieved Time Factor :${pct(actual,targetTF).toFixed(2)}%
 - GAP TO TARGET :${rupiah(target-actual)}
 - GAP To Time Factor:${rupiah(targetTF-actual)}
-
 *FOKUS CABANG*
-======================
+
 TARGET/SALES/ACV%/ON HAND
 `;
-
- focusItems.forEach((x,i)=>{
-  s+=`\n${i+1}. ${x[0]} :${v(`f${i}t`)}/${v(`f${i}a`)}/${pct(v(`f${i}a`),v(`f${i}t`)).toFixed(0)}%/${v(`f${i}o`)}`;
- });
-
- s+=`\n======================
-*MEMBER*
-1. Actual NEW MEMBER :${v("newMember")}
-2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${v("memberReceipt")}/${v("totalReceipt")}/${pct(v("memberReceipt"),v("totalReceipt")).toFixed(0)}%
-======================
-*PSM*(In Qty).
-( Target - actual - %)
-`;
-
- psmItems.forEach((x,i)=>{
-  s+=`\n${i+1}. ${document.getElementById(`p${i}n`).value} : ${v(`p${i}t`)}/${v(`p${i}a`)}/${pct(v(`p${i}a`),v(`p${i}t`)).toFixed(0)}%`;
- });
-
- s+=`\n\n======================
-*CATEGORY* (Rupiah)
-1. TOYS (NS) : ${rupiah(v("toys"))}
-1. HBPL (NS) : ${rupiah(v("hbpl"))}
-======================
-*E-COMMERCE*
-1. FEE BASE (RP) : ${rupiah(v("feeBase"))}
-
-Terimakasih`;
-
+ focusItems.forEach((x,i)=>{ s+=`\n${i+1}. ${x[0]} :${v(`f${i}t`)}/${v(`f${i}a`)}/${pct(v(`f${i}a`),v(`f${i}t`)).toFixed(0)}%/${v(`f${i}o`)}`; });
+ s+=`\n======================\n*MEMBER*\n1. Actual NEW MEMBER :${v("newMember")}\n2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${v("memberReceipt")}/${v("totalReceipt")}/${pct(v("memberReceipt"),v("totalReceipt")).toFixed(0)}%\n======================\n*PSM*(In Qty).\n( Target - actual - %)\n`;
+ psmItems.forEach((x,i)=>{ s+=`\n${i+1}. ${document.getElementById(`p${i}n`).value} : ${v(`p${i}t`)}/${v(`p${i}a`)}/${pct(v(`p${i}a`),v(`p${i}t`)).toFixed(0)}%`; });
+ s+=`\n\n======================\n*CATEGORY* (Rupiah)\n1. TOYS (NS) : ${rupiah(v("toys"))}\n2. HBPL (NS) : ${rupiah(v("hbpl"))}\n======================\n*E-COMMERCE*\n1. FEE BASE (RP) : ${rupiah(v("feeBase"))}\n\nTerimakasih`;
  return s;
 }
 
 function collectData(){
  calc();
-
  const o={};
-
- document.querySelectorAll("input").forEach(x=>{
-  o[x.id]=x.value;
- });
-
+ document.querySelectorAll("input,select").forEach(x=>{ o[x.id]=x.value; });
  let id=localStorage.getItem("cc21_report_id");
-
- if(!id){
-  id=(window.crypto&&crypto.randomUUID)
-   ? crypto.randomUUID()
-   : String(Date.now())+"-"+Math.random().toString(36).slice(2);
- }
-
- o.id=id;
-
- o.timeFactor=getTimeFactor();
- o.targetTF=v("targetMTD")*o.timeFactor/100;
- o.achieve=pct(v("actual"),v("targetMTD"));
- o.achTF=pct(v("actual"),o.targetTF);
- o.gap=v("targetMTD")-v("actual");
- o.gapTF=o.targetTF-v("actual");
- o.memberPct=pct(v("memberReceipt"),v("totalReceipt"));
-
- o.focus=focusItems.map((x,i)=>({
-  item:x[0],
-  target:v(`f${i}t`),
-  actual:v(`f${i}a`),
-  acv:pct(v(`f${i}a`),v(`f${i}t`)),
-  onHand:v(`f${i}o`)
- }));
-
- o.psm=psmItems.map((x,i)=>({
-  item:document.getElementById(`p${i}n`).value,
-  target:v(`p${i}t`),
-  actual:v(`p${i}a`),
-  acv:pct(v(`p${i}a`),v(`p${i}t`))
- }));
-
+ if(!id){ id=(window.crypto&&crypto.randomUUID)? crypto.randomUUID() : String(Date.now())+"-"+Math.random().toString(36).slice(2); }
+ o.id=id; o.timeFactor=getTimeFactor(); o.targetTF=v("targetMTD")*o.timeFactor/100; o.achieve=pct(v("actual"),v("targetMTD")); o.achTF=pct(v("actual"),o.targetTF); o.gap=v("targetMTD")-v("actual"); o.gapTF=o.targetTF-v("actual"); o.memberPct=pct(v("memberReceipt"),v("totalReceipt"));
+ o.focus=focusItems.map((x,i)=>({item:x[0],target:v(`f${i}t`),actual:v(`f${i}a`),acv:pct(v(`f${i}a`),v(`f${i}t`)),onHand:v(`f${i}o`)}));
+ o.psm=psmItems.map((x,i)=>({item:document.getElementById(`p${i}n`).value,target:v(`p${i}t`),actual:v(`p${i}a`),acv:pct(v(`p${i}a`),v(`p${i}t`))}));
  return o;
 }
 
-function saveLocal(o){
- localStorage.setItem("cc21_report_data",JSON.stringify(o));
- localStorage.setItem("cc21_report_id",o.id);
-}
-
-/* Mantém a função antiga, mas agora salva online */
+function saveLocal(o){ localStorage.setItem("cc21_report_data",JSON.stringify(o)); localStorage.setItem("cc21_report_id",o.id); }
 function saveData(){
- const o=collectData();
- saveLocal(o);
-
- if(!configured()){
-  setStatus("Data lokal tersimpan • database belum dikonfigurasi",false);
-  alert("Data tersimpan di perangkat. Hubungkan Apps Script agar tersimpan online.");
-  return;
- }
-
+ const o=collectData(); saveLocal(o);
+ if(!configured()){ setStatus("Data lokal tersimpan • database belum dikonfigurasi",false); alert("Data tersimpan di perangkat. Hubungkan Apps Script agar tersimpan online."); return; }
  setStatus("Menyimpan ke Google Sheets...",false);
-
  jsonp("save",{data:JSON.stringify(o)},res=>{
-  if(res.ok){
-   setStatus(
-    "🟢 Tersimpan online • "+
-    new Date().toLocaleTimeString("id-ID"),true
-   );
-   alert("Data berhasil disimpan ke Google Sheets.");
-   refreshDashboard();
-  }else{
-   setStatus("🔴 Gagal online: "+res.error,false);
-   alert(res.error||"Gagal menyimpan online.");
-  }
+  if(res.ok){ setStatus("🟢 Tersimpan online • "+ new Date().toLocaleTimeString("id-ID"),true); alert("Data berhasil disimpan ke Google Sheets."); refreshDashboard(); }
+  else{ setStatus("🔴 Gagal online: "+res.error,false); alert(res.error||"Gagal menyimpan online."); }
  });
 }
-
-function copyReport(){
- calc();
-
- navigator.clipboard.writeText(makeReport())
- .then(()=>{
-  alert("Laporan sudah disalin. Tinggal Paste ke WhatsApp.");
- })
- .catch(()=>{
-  alert("Browser tidak mengizinkan Copy otomatis. Silakan salin Preview secara manual.");
- });
-}
-
-function sendWhatsApp(){
- calc();
- window.open(
-  "https://wa.me/?text="+encodeURIComponent(makeReport()),
-  "_blank"
- );
-}
-
-function loadLocal(){
- const o=JSON.parse(
-  localStorage.getItem("cc21_report_data")||"null"
- );
-
- if(!o)return;
-
- Object.keys(o).forEach(k=>{
-  const e=document.getElementById(k);
-  if(e && typeof o[k]!=="object")e.value=o[k];
- });
-}
-
-function configured(){
- return API_URL.startsWith("http") &&
- !API_URL.includes("PASTE_") &&
- API_TOKEN &&
- !API_TOKEN.includes("PASTE_");
-}
-
-function setStatus(text,on){
- document.getElementById("syncStatus").textContent=text;
- document.getElementById("dot").className="dot "+(on?"online":"offline");
-}
-
-/*
- JSONP dipakai agar GitHub Pages HTTPS dapat membaca Apps Script
- tanpa masalah CORS browser.
-*/
+function copyReport(){ calc(); navigator.clipboard.writeText(makeReport()).then(()=>{ alert("Laporan sudah disalin. Tinggal Paste ke WhatsApp."); }).catch(()=>{ alert("Browser tidak mengizinkan Copy otomatis. Silakan salin Preview secara manual."); }); }
+function sendWhatsApp(){ calc(); window.open("https://wa.me/?text="+encodeURIComponent(makeReport()),"_blank"); }
+function loadLocal(){ const o=JSON.parse(localStorage.getItem("cc21_report_data")||"null"); if(!o)return; Object.keys(o).forEach(k=>{ const e=document.getElementById(k); if(e && typeof o[k]!=="object")e.value=o[k]; }); }
+function configured(){ return API_URL.startsWith("http") &&!API_URL.includes("PASTE_") && API_TOKEN &&!API_TOKEN.includes("PASTE_"); }
+function setStatus(text,on){ document.getElementById("syncStatus").textContent=text; document.getElementById("dot").className="dot "+(on?"online":"offline"); }
 function jsonp(action,params,cb){
- if(!configured()){
-  cb({ok:false,error:"API belum dikonfigurasi"});
-  return;
- }
-
- const name=
- "cc21cb_"+Date.now()+"_"+Math.random().toString(36).slice(2);
-
- let finished=false;
-
- window[name]=function(data){
-  if(finished)return;
-  finished=true;
-
-  try{
-   cb(data);
-  }finally{
-   delete window[name];
-   if(script.parentNode)script.parentNode.removeChild(script);
-  }
- };
-
- const script=document.createElement("script");
-
- const q=new URLSearchParams({
-  action:action,
-  token:API_TOKEN,
-  callback:name,
-  ...params
- });
-
- script.src=API_URL+"?"+q.toString();
-
- script.onerror=function(){
-  if(finished)return;
-  finished=true;
-  delete window[name];
-  if(script.parentNode)script.parentNode.removeChild(script);
-  cb({ok:false,error:"Tidak dapat terhubung ke Apps Script."});
- };
-
+ if(!configured()){ cb({ok:false,error:"API belum dikonfigurasi"}); return; }
+ const name= "cc21cb_"+Date.now()+"_"+Math.random().toString(36).slice(2); let finished=false;
+ window[name]=function(data){ if(finished)return; finished=true; try{ cb(data); }finally{ delete window[name]; if(script.parentNode)script.parentNode.removeChild(script); }};
+ const script=document.createElement("script"); const q=new URLSearchParams({action:action,token:API_TOKEN,callback:name,...params}); script.src=API_URL+"?"+q.toString();
+ script.onerror=function(){ if(finished)return; finished=true; delete window[name]; if(script.parentNode)script.parentNode.removeChild(script); cb({ok:false,error:"Tidak dapat terhubung ke Apps Script."}); };
  document.body.appendChild(script);
 }
-
 function refreshDashboard(){
- if(!configured()){
-  setStatus("Database online belum dikonfigurasi",false);
-  return;
- }
-
+ if(!configured()){ setStatus("Database online belum dikonfigurasi",false); return; }
  const period=document.getElementById("period").value;
-
  jsonp("list",{period:period},res=>{
-  if(!res.ok){
-   setStatus("🔴 "+res.error,false);
-   return;
-  }
-
-  setStatus(
-   "🟢 Online • update "+
-   new Date().toLocaleTimeString("id-ID"),true
-  );
-
-  const arr=res.reports||[];
-  const dash=document.getElementById("dashboard");
-
-  if(!arr.length){
-   dash.innerHTML=
-   '<div class="muted">Belum ada laporan online untuk periode ini.</div>';
-   return;
-  }
-
-  dash.innerHTML=
-  arr.slice()
-  .sort((a,b)=>String(a.storeCode).localeCompare(String(b.storeCode)))
-  .map(r=>`
-   <div class="store-card">
-    <small>${r.timestamp?new Date(r.timestamp).toLocaleTimeString("id-ID"):""}</small>
-    <b>${escapeHtml(r.storeCode)} — ${escapeHtml(r.storeName)}</b>
-    <span>Actual: ${rupiah(r.actual)}</span><br>
-    <span>Achieve: ${Number(r.achieve||0).toFixed(2)}%</span>
-   </div>
-  `).join("");
+  if(!res.ok){ setStatus("🔴 "+res.error,false); return; }
+  setStatus("🟢 Online • update "+ new Date().toLocaleTimeString("id-ID"),true);
+  const arr=res.reports||[]; const dash=document.getElementById("dashboard");
+  if(!arr.length){ dash.innerHTML='<div class="muted">Belum ada laporan online untuk periode ini.</div>'; return; }
+  dash.innerHTML= arr.slice().sort((a,b)=>String(a.storeCode).localeCompare(String(b.storeCode))).map(r=>`<div class="store-card"><small>${r.timestamp?new Date(r.timestamp).toLocaleTimeString("id-ID"):""}</small><b>${escapeHtml(r.storeCode)} — ${escapeHtml(r.storeName)}</b><span>Sales: ${escapeHtml(r.namaSales||'-')}</span><br><span>Actual: ${rupiah(r.actual)}</span><br><span>Achieve: ${Number(r.achieve||0).toFixed(2)}%</span></div>`).join("");
  });
 }
-
 function loadCloudForCurrentStore(){
- if(!configured()){
-  alert("API belum dikonfigurasi.");
-  return;
- }
-
- const period=document.getElementById("period").value;
- const code=document.getElementById("storeCode").value;
- const shift=document.getElementById("shift").value;
-
+ if(!configured()){ alert("API belum dikonfigurasi."); return; }
+ const period=document.getElementById("period").value; const code=document.getElementById("storeCode").value; const shift=document.getElementById("shift").value;
  jsonp("list",{period:period},res=>{
-  if(!res.ok){
-   alert(res.error||"Gagal mengambil data.");
-   return;
-  }
-
-  const r=(res.reports||[]).find(x=>
-   x.storeCode===code && x.shift===shift
-  );
-
-  if(!r){
-   alert("Belum ada data online untuk toko dan shift ini.");
-   return;
-  }
-
-  const fields=[
-   "period","wh","am","ac","storeCode","storeName","shift",
-   "targetMTD","actual","newMember","memberReceipt","totalReceipt",
-   "toys","hbpl","feeBase"
-  ];
-
-  fields.forEach(k=>{
-   const e=document.getElementById(k);
-   if(e && r[k]!==undefined)e.value=r[k];
-  });
-
-  (r.focus||[]).forEach((x,i)=>{
-   const map={
-    target:`f${i}t`,
-    actual:`f${i}a`,
-    onHand:`f${i}o`
-   };
-
-   Object.keys(map).forEach(k=>{
-    const e=document.getElementById(map[k]);
-    if(e)e.value=x[k]||0;
-   });
-  });
-
-  (r.psm||[]).forEach((x,i)=>{
-   const map={
-    item:`p${i}n`,
-    target:`p${i}t`,
-    actual:`p${i}a`
-   };
-
-   Object.keys(map).forEach(k=>{
-    const e=document.getElementById(map[k]);
-    if(e)e.value=x[k]??0;
-   });
-  });
-
-  saveLocal(collectData());
-  calc();
-
-  alert("Data online berhasil dimuat.");
+  if(!res.ok){ alert(res.error||"Gagal mengambil data."); return; }
+  const r=(res.reports||[]).find(x=> x.storeCode===code && x.shift===shift);
+  if(!r){ alert("Belum ada data online untuk toko dan shift ini."); return; }
+  const fields=["period","wh","am","ac","storeCode","storeName","shift","namaSales","targetMTD","actual","newMember","memberReceipt","totalReceipt","toys","hbpl","feeBase"];
+  fields.forEach(k=>{ const e=document.getElementById(k); if(e && r[k]!==undefined)e.value=r[k]; });
+  (r.focus||[]).forEach((x,i)=>{ const map={target:`f${i}t`,actual:`f${i}a`,onHand:`f${i}o`}; Object.keys(map).forEach(k=>{ const e=document.getElementById(map[k]); if(e)e.value=x[k]||0; }); });
+  (r.psm||[]).forEach((x,i)=>{ const map={item:`p${i}n`,target:`p${i}t`,actual:`p${i}a`}; Object.keys(map).forEach(k=>{ const e=document.getElementById(map[k]); if(e)e.value=x[k]??0; }); });
+  saveLocal(collectData()); calc(); alert("Data online berhasil dimuat.");
  });
 }
-
-function escapeHtml(s){
- return String(s??"").replace(
-  /[&<>"']/g,
-  m=>({
-   "&":"&amp;",
-   "<":"&lt;",
-   ">":"&gt;",
-   '"':"&quot;",
-   "'":"&#39;"
-  }[m])
- );
-}
+function escapeHtml(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 
 /* Inisialisasi */
+checkLogin();
 renderTables();
-
 const now=new Date();
-
-document.getElementById("period").value=
- now.getFullYear()+"-"+
- String(now.getMonth()+1).padStart(2,"0")+"-"+
- String(now.getDate()).padStart(2,"0");
-
+document.getElementById("period").value= now.getFullYear()+"-"+ String(now.getMonth()+1).padStart(2,"0")+"-"+ String(now.getDate()).padStart(2,"0");
 loadLocal();
-
-document.querySelectorAll("input")
-.forEach(e=>e.addEventListener("input",calc));
-
+document.querySelectorAll("input,select").forEach(e=>e.addEventListener("input",calc));
 calc();
-
-if(configured()){
- refreshDashboard();
- setInterval(refreshDashboard,30000);
-}
+if(configured()){ refreshDashboard(); setInterval(refreshDashboard,30000); }
 </script>
 </body>
 </html>
