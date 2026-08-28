@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21</title>
+<title>Report Sales Harian</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
 .login-box,.app-box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -73,7 +73,12 @@ button.whatsapp{background:#25D366}
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
 const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
-const STORE_LIST = {"C624":"TOKO C624","C560":"TOKO C560","CH81":"TOKO CH81","CG76":"TOKO CG76","C573":"TOKO C573","CE47":"TOKO CE47","CA71":"TOKO CA71","CI30":"TOKO CI30","CH41":"TOKO CH41","CG54":"TOKO CG54","C935":"TOKO C935","C965":"TOKO C965","CG86":"TOKO CG86","CA94":"TOKO CA94","C574":"TOKO C574","CI15":"TOKO CI15","CI54":"TOKO CI54","CF50":"TOKO CF50","CC21":"TOKO CC21 KUTN","CI84":"TOKO CI84"};
+const STORE_LIST = {
+  "C624":"RWBT", "C560":"RAJ", "CH81":"CDKS", "CG76":"SPMM", "C573":"GMM",
+  "CE47":"MKRI", "CI30":"STTD", "CH41":"KPMRK", "CG54":"MM2100", "C935":"TLJ2",
+  "CA71":"WSGN", "C965":"CBNU", "CG86":"JKST", "CA94":"KPTI", "C574":"SKU",
+  "CI15":"RPSU", "CI54":"RJLB", "CF50":"DNIA", "CC21":"KUTN", "CI84":"TLKW"
+};
 const PSM_DEFAULT = [["Le mineral",210,8],["Nescafe",75,6],["Happy tos",33,1],["Sedaap",66,10],["Roma",45,3],["Rinso",17,18],["Kahf",24,0],["H&S",12,0],["Colagena",55,0]];
 let state = { user: null };
 
@@ -89,9 +94,9 @@ function login(){
   state.user = { code: code, storeName: STORE_LIST[code], namaSales: nama };
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  document.getElementById('who').textContent = `${state.user.storeName} - ${state.user.namaSales}`;
+  document.getElementById('who').textContent = `TOKO ${code} ${state.user.storeName} - ${state.user.namaSales}`;
   document.getElementById('storeCode').value = code;
-  document.getElementById('storeName').value = STORE_LIST[code];
+  document.getElementById('storeName').value = state.user.storeName;
   document.getElementById('period').value = new Date().toISOString().slice(0,10);
   buildPSM();
 }
@@ -121,8 +126,4 @@ function getData(){
 
 function generateWA(d){ return `REPORT SALES HARIAN\nPERIODE : ${formatDate(d.period)}\nWH : ${d.wh}\nAM : ${d.am}\nAC : ${d.ac}\nKD Toko : ${d.storeCode}\nNama Toko : ${d.storeName}\nShift : ${d.shift}\n======================\n\n*REVENUE*\n1. NET SALES\n- Time factor: ${d.timeFactor}%\n- TARGET MTD :${formatRp(d.targetMTD)}\n- Target Time Factor: ${formatRp(d.targetTF)}\n- ACTUAL :${formatRp(d.actual)}\n- ACHIVE MTD:${d.achieve}%\n- AChieved Time Factor :${d.achTF}%\n- GAP TO TARGET :${formatRp(d.gap)}\n- GAP To Time Factor:${formatRp(d.gapTF)}\n\n*FOKUS CABANG*\n======================\nTARGET/SALES/ACV%/ON HAND\n1. TEBUS MURAH (QTY REDEEM) :${d.fokus.tm[0]}/${d.fokus.tm[1]}/${(d.fokus.tm[1]/d.fokus.tm[0]*100).toFixed(0)}%/${d.fokus.tm[2]}\n2. SERBA GRATIS (PAKET) :${d.fokus.sg[0]}/${d.fokus.sg[1]}/${(d.fokus.sg[1]/d.fokus.sg[0]*100).toFixed(0)}%/${d.fokus.sg[2]}\n3. SEUUGER :${d.fokus.seu[0]}/${d.fokus.seu[1]}/${(d.fokus.seu[1]/d.fokus.seu[0]*100).toFixed(0)}%/${d.fokus.seu[2]}\n4. PROMO CEBAN :${d.fokus.pc[0]}/${d.fokus.pc[1]}/${(d.fokus.pc[1]/d.fokus.pc[0]*100).toFixed(0)}%/${d.fokus.pc[2]}\n======================\n*MEMBER*\n1. Actual NEW MEMBER :${d.newMember}\n2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${d.memberReceipt}/${d.totalReceipt}/${d.memberPct}%\n======================\n*PSM*(In Qty).\n( Target - actual - %)\n${d.psm.map(p=>`${p[0]} : ${p[1]}/${p[2]}/${p[1]>0?(p[2]/p[1]*100).toFixed(0):0}%`).join('\n')}\n======================\n*CATEGORY* (Rupiah)\n1. TOYS (NS) : ${formatRp(d.toys)}\n2. HBPL (NS) : ${formatRp(d.hbpl)}\n======================\n*E-COMMERCE*\n1. FEE BASE (RP) : ${formatRp(d.feeBase)}\n\nTerimakasih`; }
 
-function kirimSemua(){ const data = getData(); document.getElementById('status').innerHTML = '⏳ Menyimpan ke Sheet...'; callAPI('save', {data: JSON.stringify({...data,id:Date.now(),Timestamp:new Date()})}, res => { if(res.ok){ document.getElementById('status').innerHTML = '🟢 Tersimpan! Buka WA...'; const wa = generateWA(data); window.open(`https://wa.me/?text=${encodeURIComponent(wa)}`, '_blank'); } else { document.getElementById('status').innerHTML = '🔴 Gagal Simpan: '+res.error; } }); }
-function callAPI(action, params, cb){ params.action = action; params.token = API_TOKEN; const callback = 'cb_'+Date.now(); window[callback] = cb; params.callback = callback; const s = document.createElement('script'); s.src = API_URL+'?'+new URLSearchParams(params).toString(); document.head.appendChild(s); }
-</script>
-</body>
-</html>
+function kirimSemua(){ const data = getData(); document.getElementById('status').innerHTML = '⏳ Menyimpan ke Sheet...'; callAPI('save', {data: JSON.stringify({...data,id:Date.now(),Timestamp:new Date()})}, res => { if(res.ok){ document.getElementById('status').innerHTML = '🟢 Tersimpan! Buka WA...'; const wa = generateWA(data); window.open(`https://wa.me/?text=${
