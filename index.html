@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21 FINAL</title>
+<title>Report Sales Harian CC21 FINAL PSM EDIT</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:16px}
 .login-box,.app-box{max-width:850px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -39,16 +39,172 @@ textarea{height:400px;font-family:monospace;white-space:pre}
   <h2>REPORT SALES HARIAN</h2>
   <p id="who" style="text-align:center;color:#2563eb;font-weight:bold"></p>
   
-  <div class="grid">
-    <div><label>PERIODE</label><input id="period" type="date"></div>
-    <div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div>
+  <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
+  <div class="grid"><div><label>WH</label><input id="wh" type="text" value="Bekasi"></div><div><label>AM</label><input id="am" type="text" value="Syahrul"></div></div>
+  <div class="grid"><div><label>AC</label><input id="ac" type="text" value="Triyanto"></div><div><label>KD Toko</label><input id="storeCode" type="text" readonly></div></div>
+  <label>Nama Toko</label><input id="storeName" type="text" readonly>
+
+  <h3>*REVENUE*</h3>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" step="0.01" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="345059891"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="4646000"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="25000"></div></div>
+
+  <h3>*FOKUS CABANG*</h3>
+  <div class="section">
+    <div class="small-grid"><b>Nama</b><b>Target</b><b>Sales</b><b>On Hand</b></div>
+    <div class="small-grid"><span>TEBUS MURAH (QTY REDEEM)</span><input id="tm_target" value="20"><input id="tm_sales" value="21"><input id="tm_oh" value="0"></div>
+    <div class="small-grid"><span>SERBA GRATIS (PAKET)</span><input id="sg_target" value="17"><input id="sg_sales" value="8"><input id="sg_oh" value="0"></div>
+    <div class="small-grid"><span>SEUUGER</span><input id="seu_target" value="40"><input id="seu_sales" value="4"><input id="seu_oh" value="0"></div>
+    <div class="small-grid"><span>PROMO CEBAN</span><input id="pc_target" value="69"><input id="pc_sales" value="1"><input id="pc_oh" value="0"></div>
   </div>
-  <div class="grid">
-    <div><label>WH</label><input id="wh" type="text" value="Bekasi"></div>
-    <div><label>AM</label><input id="am" type="text" value="Syahrul"></div>
+
+  <h3>*MEMBER*</h3>
+  <div class="grid"><div><label>Actual NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="47"></div></div>
+  <label>Total STRUK</label><input id="totalReceipt" type="number" value="69">
+
+  <h3>*PSM (In Qty)* - NAMA BISA DI EDIT</h3>
+  <div class="section">
+    <div class="small-grid"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>
+    <div class="small-grid"><input id="psm1n" value="Le mineral"><input id="psm1t" value="210"><input id="psm1a" value="8"><input id="psm1p" readonly></div>
+    <div class="small-grid"><input id="psm2n" value="Nescafe"><input id="psm2t" value="75"><input id="psm2a" value="6"><input id="psm2p" readonly></div>
+    <div class="small-grid"><input id="psm3n" value="Happy tos"><input id="psm3t" value="33"><input id="psm3a" value="1"><input id="psm3p" readonly></div>
+    <div class="small-grid"><input id="psm4n" value="Sedaap"><input id="psm4t" value="66"><input id="psm4a" value="10"><input id="psm4p" readonly></div>
+    <div class="small-grid"><input id="psm5n" value="Roma"><input id="psm5t" value="45"><input id="psm5a" value="3"><input id="psm5p" readonly></div>
+    <div class="small-grid"><input id="psm6n" value="Rinso"><input id="psm6t" value="17"><input id="psm6a" value="18"><input id="psm6p" readonly></div>
+    <div class="small-grid"><input id="psm7n" value="Kahf"><input id="psm7t" value="24"><input id="psm7a" value="0"><input id="psm7p" readonly></div>
+    <div class="small-grid"><input id="psm8n" value="H&S"><input id="psm8t" value="12"><input id="psm8a" value="0"><input id="psm8p" readonly></div>
+    <div class="small-grid"><input id="psm9n" value="Colagena"><input id="psm9t" value="55"><input id="psm9a" value="0"><input id="psm9p" readonly></div>
   </div>
-  <div class="grid">
-    <div><label>AC</label><input id="ac" type="text" value="Triyanto"></div>
-    <div><label>KD Toko</label><input id="storeCode" type="text" readonly></div>
-  </div>
-  <label>Nama Toko</label><input id="storeName" type="text"
+
+  <h3>*CATEGORY (Rupiah)*</h3>
+  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
+
+  <button id="saveBtn">💾 Simpan Data</button>
+  <button id="copyBtn" class="green">📋 Copy Format WA</button>
+  <div id="status" class="status"></div>
+  <textarea id="waOutput" class="hidden" readonly></textarea>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
+const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
+const STORE_LIST = {"C624":"TOKO C624","C560":"TOKO C560","CH81":"TOKO CH81","CG76":"TOKO CG76","C573":"TOKO C573","CE47":"TOKO CE47","CA71":"TOKO CA71","CI30":"TOKO CI30","CH41":"TOKO CH41","CG54":"TOKO CG54","C935":"TOKO C935","C965":"TOKO C965","CG86":"TOKO CG86","CA94":"TOKO CA94","C574":"TOKO C574","CI15":"TOKO CI15","CI54":"TOKO CI54","CF50":"TOKO CF50","CC21":"TOKO CC21 KUTN","CI84":"TOKO CI84"};
+let state = { user: null, lastData: null };
+
+document.getElementById('loginBtn').onclick = login;
+document.getElementById('saveBtn').onclick = saveReport;
+document.getElementById('copyBtn').onclick = copyWA;
+for(let i=1;i<=9;i++) document.getElementById(`psm${i}t`).oninput = calcPSM, document.getElementById(`psm${i}a`).oninput = calcPSM;
+
+function login(){ 
+  const code = document.getElementById('storeCodeLogin').value.trim().toUpperCase(); 
+  const nama = document.getElementById('namaSalesLogin').value.trim(); 
+  if(!code ||!nama) return alert("Isi Kode Toko dan Nama Sales"); 
+  if(!STORE_LIST[code]) return alert("Kode Toko tidak terdaftar"); 
+  state.user = { code: code, storeName: STORE_LIST[code], namaSales: nama }; 
+  document.getElementById('loginScreen').classList.add('hidden'); 
+  document.getElementById('app').classList.remove('hidden'); 
+  document.getElementById('who').textContent = `${state.user.storeName} - ${state.user.namaSales}`; 
+  document.getElementById('storeCode').value = code; 
+  document.getElementById('storeName').value = STORE_LIST[code]; 
+  document.getElementById('period').value = new Date().toISOString().slice(0,10); 
+  calcPSM();
+}
+
+function calcPSM(){
+  for(let i=1;i<=9;i++){
+    let t=+document.getElementById(`psm${i}t`).value;
+    let a=+document.getElementById(`psm${i}a`).value;
+    document.getElementById(`psm${i}p`).value = t>0? (a/t*100).toFixed(0)+'%' : '0%';
+  }
+}
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function formatRp(n){return 'Rp '+Number(n).toLocaleString('id-ID')}
+function formatDate(d){const opt={day:'2-digit',month:'long'}; return new Date(d).toLocaleDateString('id-ID',opt)}
+
+function saveReport(){ 
+  const targetTF = Math.round(+targetMTD.value * +timeFactor.value / 100);
+  const achieve = (+actual.value / +targetMTD.value * 100).toFixed(2);
+  const achTF = (+actual.value / targetTF * 100).toFixed(2);
+  const gap = +targetMTD.value - +actual.value;
+  const gapTF = targetTF - +actual.value;
+  const memberPct = (+memberReceipt.value / +totalReceipt.value * 100).toFixed(0);
+
+  state.lastData = {
+    period: period.value, wh: wh.value, am: am.value, ac: ac.value, shift: shift.value,
+    storeCode: state.user.code, storeName: state.user.storeName,
+    timeFactor: +timeFactor.value, targetMTD: +targetMTD.value, targetTF, actual: +actual.value, achieve, achTF, gap, gapTF,
+    newMember: +newMember.value, memberReceipt: +memberReceipt.value, totalReceipt: +totalReceipt.value, memberPct,
+    toys: +toys.value, hbpl: +hbpl.value, feeBase: +feeBase.value,
+    fokus: {tm:[+tm_target.value,+tm_sales.value,+tm_oh.value], sg:[+sg_target.value,+sg_sales.value,+sg_oh.value], seu:[+seu_target.value,+seu_sales.value,+seu_oh.value], pc:[+pc_target.value,+pc_sales.value,+pc_oh.value]},
+    psm: [
+      [psm1n.value,+psm1t.value,+psm1a.value],[psm2n.value,+psm2t.value,+psm2a.value],[psm3n.value,+psm3t.value,+psm3a.value],
+      [psm4n.value,+psm4t.value,+psm4a.value],[psm5n.value,+psm5t.value,+psm5a.value],[psm6n.value,+psm6t.value,+psm6a.value],
+      [psm7n.value,+psm7t.value,+psm7a.value],[psm8n.value,+psm8t.value,+psm8a.value],[psm9n.value,+psm9t.value,+psm9a.value]
+    ]
+  };
+
+  document.getElementById('status').innerHTML = '⏳ Menyimpan...';
+  callAPI('save', {data: JSON.stringify({...state.lastData,id:uid(),Timestamp:new Date()})}, res => {
+    document.getElementById('status').innerHTML = res.ok? '🟢 Tersimpan online' : '🔴 Gagal: '+res.error;
+  });
+}
+
+function copyWA(){
+  if(!state.lastData) return alert("Simpan Data dulu");
+  const d=state.lastData;
+  let wa = `REPORT SALES HARIAN
+PERIODE : ${formatDate(d.period)}
+WH : ${d.wh}
+AM : ${d.am}
+AC : ${d.ac}
+KD Toko : ${d.storeCode}
+Nama Toko : ${d.storeName}
+Shift : ${d.shift}
+======================
+
+*REVENUE*
+1. NET SALES
+- Time factor: ${d.timeFactor}%
+- TARGET MTD :${formatRp(d.targetMTD)}
+- Target Time Factor: ${formatRp(d.targetTF)}
+- ACTUAL :${formatRp(d.actual)}
+- ACHIVE MTD:${d.achieve}%
+- AChieved Time Factor :${d.achTF}%
+- GAP TO TARGET :${formatRp(d.gap)}
+- GAP To Time Factor:${formatRp(d.gapTF)}
+
+*FOKUS CABANG*
+======================
+TARGET/SALES/ACV%/ON HAND
+1. TEBUS MURAH (QTY REDEEM) :${d.fokus.tm[0]}/${d.fokus.tm[1]}/${(d.fokus.tm[1]/d.fokus.tm[0]*100).toFixed(0)}%/${d.fokus.tm[2]}
+2. SERBA GRATIS (PAKET) :${d.fokus.sg[0]}/${d.fokus.sg[1]}/${(d.fokus.sg[1]/d.fokus.sg[0]*100).toFixed(0)}%/${d.fokus.sg[2]}
+3. SEUUGER :${d.fokus.seu[0]}/${d.fokus.seu[1]}/${(d.fokus.seu[1]/d.fokus.seu[0]*100).toFixed(0)}%/${d.fokus.seu[2]}
+4. PROMO CEBAN :${d.fokus.pc[0]}/${d.fokus.pc[1]}/${(d.fokus.pc[1]/d.fokus.pc[0]*100).toFixed(0)}%/${d.fokus.pc[2]}
+======================
+*MEMBER*
+1. Actual NEW MEMBER :${d.newMember}
+2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${d.memberReceipt}/${d.totalReceipt}/${d.memberPct}%
+======================
+*PSM*(In Qty).
+( Target - actual - %)
+${d.psm.map(p=>`${p[0]} : ${p[1]}/${p[2]}/${p[1]>0?(p[2]/p[1]*100).toFixed(0):0}%`).join('\n')}
+======================
+*CATEGORY* (Rupiah)
+1. TOYS (NS) : ${formatRp(d.toys)}
+2. HBPL (NS) : ${formatRp(d.hbpl)}
+======================
+*E-COMMERCE*
+1. FEE BASE (RP) : ${formatRp(d.feeBase)}
+
+Terimakasih`;
+  document.getElementById('waOutput').value = wa;
+  document.getElementById('waOutput').classList.remove('hidden');
+  navigator.clipboard.writeText(wa);
+  alert("Format WA sudah di copy!");
+}
+
+function callAPI(action, params, cb){ params.action = action; params.token = API_TOKEN; const callback = 'cb_'+Date.now(); window[callback] = cb; params.callback = callback; const s = document.createElement('script'); s.src = API_URL+'?'+new URLSearchParams(params).toString(); document.head.appendChild(s); }
+</script>
+</body>
+</html>
