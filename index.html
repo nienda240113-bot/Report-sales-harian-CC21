@@ -6,15 +6,20 @@
 <title>Report Sales Harian CC21</title>
 <style>
 body{font-family:sans-serif;background:#f4f4f4;margin:0;padding:16px}
-.login-box,.app-box{max-width:600px;margin:40px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-h2{text-align:center}
-label{display:block;margin-top:12px;font-weight:bold}
-input,select,button{width:100%;padding:10px;margin-top:6px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
-button{background:#2563eb;color:#fff;border:none;margin-top:16px;cursor:pointer}
+.login-box,.app-box{max-width:700px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h2{text-align:center;margin:0 0 10px}
+label{display:block;margin-top:10px;font-weight:bold;font-size:14px}
+input,select,button{width:100%;padding:10px;margin-top:4px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+button{background:#2563eb;color:#fff;border:none;margin-top:16px;cursor:pointer;font-weight:bold}
 button:hover{background:#1d4ed8}
+button.secondary{background:#6b7280}
+button.secondary:hover{background:#4b5563}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.status{margin-top:12px;text-align:center;font-size:14px}
+.status{margin-top:12px;text-align:center;font-size:14px;font-weight:bold}
 .hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+th,td{border:1px solid #ddd;padding:6px;text-align:center}
+th{background:#f1f5f9}
 </style>
 </head>
 <body>
@@ -27,90 +32,3 @@ button:hover{background:#1d4ed8}
   <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
   <button id="loginBtn">MASUK</button>
 </div>
-
-<div id="app" class="app-box hidden">
-  <h2>Report Sales Harian</h2>
-  <p id="who"></p>
-  <div class="grid">
-    <div><label>Periode</label><input id="period" type="month"></div>
-    <div><label>Shift</label><select id="shift"><option>Pagi</option><option>Siang</option><option>Malam</option></select></div>
-  </div>
-  <div class="grid">
-    <div><label>WH</label><input id="wh" type="number" value="0"></div>
-    <div><label>AM</label><input id="am" type="number" value="0"></div>
-  </div>
-  <div class="grid">
-    <div><label>AC</label><input id="ac" type="number" value="0"></div>
-    <div><label>Actual</label><input id="actual" type="number" value="0"></div>
-  </div>
-  <label>Target MTD</label><input id="targetMTD" type="number" value="0">
-
-  <button id="saveBtn">💾 Simpan Data</button>
-  <div id="status" class="status"></div>
-</div>
-
-<script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
-const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
-
-const STORE_LIST = {
-  "C624":"TOKO C624", "C560":"TOKO C560", "CH81":"TOKO CH81", "CG76":"TOKO CG76", "C573":"TOKO C573",
-  "CE47":"TOKO CE47", "CA71":"TOKO CA71", "CI30":"TOKO CI30", "CH41":"TOKO CH41", "CG54":"TOKO CG54",
-  "C935":"TOKO C935", "C965":"TOKO C965", "CG86":"TOKO CG86", "CA94":"TOKO CA94", "C574":"TOKO C574",
-  "CI15":"TOKO CI15", "CI54":"TOKO CI54", "CF50":"TOKO CF50", "CC21":"TOKO CC21 KUTN", "CI84":"TOKO CI84"
-};
-
-let state = { user: null };
-
-document.getElementById('loginBtn').onclick = login;
-document.getElementById('saveBtn').onclick = saveReport;
-
-function login(){
-  const code = document.getElementById('storeCodeLogin').value.trim().toUpperCase();
-  const nama = document.getElementById('namaSalesLogin').value.trim();
-  if(!code ||!nama) return alert("Isi Kode Toko dan Nama Sales");
-  if(!STORE_LIST[code]) return alert("Kode Toko tidak terdaftar");
-  state.user = { code: code, storeName: STORE_LIST[code], namaSales: nama };
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('who').textContent = `${state.user.storeName} - ${state.user.namaSales}`;
-}
-
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-
-function saveReport(){
-  const data = {
-    id: uid(),
-    period: document.getElementById('period').value,
-    storeCode: state.user.code,
-    storeName: state.user.storeName,
-    shift: document.getElementById('shift').value,
-    wh: +document.getElementById('wh').value,
-    am: +document.getElementById('am').value,
-    ac: +document.getElementById('ac').value,
-    namaSales: state.user.namaSales,
-    targetMTD: +document.getElementById('targetMTD').value,
-    actual: +document.getElementById('actual').value,
-    achieve:0, achTF:0, gap:0, gapTF:0, timeFactor:0, targetTF:0,
-    newMember:0, memberReceipt:0, totalReceipt:0, memberPct:0, toys:0, hbpl:0, feeBase:0,
-    focus:[], psm:[]
-  };
-
-  const params = new URLSearchParams();
-  params.append('action','save');
-  params.append('token',API_TOKEN);
-  params.append('data',JSON.stringify(data));
-  params.append('callback','cc21cb_'+Date.now());
-
-  window[params.get('callback')] = function(res){
-    if(res.ok) document.getElementById('status').innerHTML = '🟢 Tersimpan online • '+new Date().toLocaleTimeString();
-    else document.getElementById('status').innerHTML = '🔴 Gagal: '+res.error;
-  };
-
-  const s = document.createElement('script');
-  s.src = API_URL+'?'+params.toString();
-  document.head.appendChild(s);
-}
-</script>
-</body>
-</html>
