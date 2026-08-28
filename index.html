@@ -3,15 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21</title>
+<title>Report Sales Harian CC21 Auto WA</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
 .login-box,.app-box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 h2{text-align:center;margin:0 0 10px;font-size:18px}
 h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
 label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
-input,select,button,textarea{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px}
+input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px}
 button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold}
 button:hover{background:#1d4ed8}
 button.green{background:#16a34a}
-button.whatsapp{background:#25
+button.whatsapp{background:#25D366}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status{margin-top:12px;text-align:center;font-size:14px;font-weight:bold}
+.hidden{display:none}
+.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;align-items:center;font-size:12px;margin-bottom:4px}
+.row input{padding:6px;font-size:13px}
+@media (max-width: 600px){.grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-box">
+  <h2>Login Sales</h2>
+  <label>Kode Toko</label>
+  <input id="storeCodeLogin" type="text" placeholder="Contoh: CC21" style="text-transform:uppercase" />
+  <label>Nama Sales</label>
+  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
+  <button id="loginBtn">MASUK</button>
+  <p id="loginError" style="color:red;text-align:center"></p>
+</div>
+
+<div id="app" class="app-box hidden">
+  <h2>REPORT SALES HARIAN</h2>
+  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold;font-size:13px"></p>
+
+  <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
+  <div class="grid"><div><label>WH</label><input id="wh" value="Bekasi"></div><div><label>AM</label><input id="am" value="Syahrul"></div></div>
+  <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div><div><label>KD Toko</label><input id="storeCode" readonly></div></div>
+  <label>Nama Toko</label><input id="storeName" readonly>
+
+  <h3>*REVENUE*</h3>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="345059891"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="4646000"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="25000"></div></div>
+
+  <h3>*FOKUS CABANG*</h3>
+  <div class="section">
+    <div class="row"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
+    <div class="row"><span>TEBUS MURAH</span><input id="tm_t" type="number" value="20"><input id="tm_s" type="number" value="21"><input id="tm_o" type="number" value="0"></div>
+    <div class="row"><span>SERBA GRATIS</span><input id="sg_t" type="number" value="17"><input id="sg_s" type="number" value="8"><input id="sg_o" type="number" value="0"></div>
+    <div class="row"><span>SEUUGER</span><input id="seu_t" type="number" value="40"><input id="seu_s" type="number" value="4"><input id="seu_o" type="number" value="0"></div>
+    <div class="row"><span>PROMO CEBAN</span><input id="pc_t" type="number" value="69"><input id="pc_s" type="number" value="1"><input id="pc_o" type="number" value="0"></div>
+  </div>
+
+  <h3>*MEMBER*</h3>
+  <div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="47"></div></div>
+  <label>Total STRUK</label><input id="totalReceipt" type="number" value="69">
+
+  <h3>*PSM (In Qty)* NAMA BISA EDIT</h3>
+  <div class="section" id="psmSection"></div>
+
+  <h3>*C
