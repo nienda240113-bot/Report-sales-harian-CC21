@@ -14,7 +14,9 @@ input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc
 button{background:#25D366;color:#fff;border:none;margin-top:15px;font-weight:bold;font-size:16px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
-.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px;align-items:center}
+.row input{padding:6px}
+small{color:gray;font-size:11px}
 @media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
@@ -28,7 +30,7 @@ button{background:#25D366;color:#fff;border:none;margin-top:15px;font-weight:bol
   <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div></div>
   
   <div class="grid"><div><label>KD Toko</label><input id="storeCode" placeholder="CC21" style="text-transform:uppercase"></div><div><label>Nama Toko</label><input id="storeName" placeholder="KUTN"></div></div>
-  <small style="color:gray">Isi KD Toko: C624,RWBT C560,RAJ CH81,CDKS CG76,SPMM C573,GMM CE47,MKRI CI30,STTD CH41,KPMRK CG54,MM2100 C935,TLJ2 CA71,WSGN C965,CBNU CG86,JKST CA94,KPTI C574,SKU CI15,RPSU CI54,RJLB CF50,DNIA CC21,KUTN CI84,TLKW</small>
+  <small>KD: C624-RWBT C560-RAJ CH81-CDKS CG76-SPMM C573-GMM CE47-MKRI CI30-STTD CH41-KPMRK CG54-MM2100 C935-TLJ2 CA71-WSGN C965-CBNU CG86-JKST CA94-KPTI C574-SKU CI15-RPSU CI54-RJLB CF50-DNIA CC21-KUTN CI84-TLKW</small>
 
   <h3>*REVENUE*</h3>
   <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="0"></div></div>
@@ -37,4 +39,47 @@ button{background:#25D366;color:#fff;border:none;margin-top:15px;font-weight:bol
   <h3>*FOKUS CABANG*</h3>
   <div class="section">
     <div class="row"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
-    <div class="row"><span>TEBUS MURAH</span><input id="tm_t" type="number" value="0"><input id="tm_s" type="number" value="0"><input id="tm_o"
+    <div class="row"><span>TEBUS MURAH</span><input id="tm_t" type="number" value="0"><input id="tm_s" type="number" value="0"><input id="tm_o" type="number" value="0"></div>
+    <div class="row"><span>SERBA GRATIS</span><input id="sg_t" type="number" value="0"><input id="sg_s" type="number" value="0"><input id="sg_o" type="number" value="0"></div>
+    <div class="row"><span>SEUUGER</span><input id="seu_t" type="number" value="0"><input id="seu_s" type="number" value="0"><input id="seu_o" type="number" value="0"></div>
+    <div class="row"><span>PROMO CEBAN</span><input id="pc_t" type="number" value="0"><input id="pc_s" type="number" value="0"><input id="pc_o" type="number" value="0"></div>
+  </div>
+
+  <h3>*MEMBER*</h3>
+  <div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="0"></div></div>
+  <label>Total STRUK</label><input id="totalReceipt" type="number" value="0">
+
+  <h3>*PSM (In Qty)*</h3>
+  <div class="section" id="psmSection"></div>
+
+  <h3>*CATEGORY*</h3>
+  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
+
+  <button onclick="kirimWA()">📲 KIRIM KE WA</button>
+</div>
+
+<script>
+document.getElementById('period').value = new Date().toISOString().slice(0,10);
+const PSM = [["Le mineral",0,0],["Nescafe",0,0],["Happy tos",0,0],["Sedaap",0,0],["Roma",0,0],["Rinso",0,0],["Kahf",0,0],["H&S",0,0],["Colagena",0,0]];
+buildPSM();
+
+function buildPSM(){
+  let html = '<div class="row"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>';
+  PSM.forEach((p,i)=>{
+    html += `<div class="row"><input id="psm${i}n" value="${p[0]}"><input id="psm${i}t" type="number" value="${p[1]}" oninput="calc()"><input id="psm${i}a" type="number" value="${p[2]}" oninput="calc()"><input id="psm${i}p" readonly></div>`
+  });
+  document.getElementById('psmSection').innerHTML = html;
+}
+function calc(){ for(let i=0;i<9;i++){ let t=+document.getElementById(`psm${i}t`).value||0; let a=+document.getElementById(`psm${i}a`).value||0; document.getElementById(`psm${i}p`).value = t>0? (a/t*100).toFixed(0)+'%' : '0%'; } }
+
+function formatRp(n){return 'Rp '+Number(n||0).toLocaleString('id-ID')}
+function formatDate(d){if(!d) return ''; return new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'long'})}
+
+function kirimWA(){
+  let psmTxt = ''; for(let i=0;i<9;i++){ let n=document.getElementById(`psm${i}n`).value; let t=+document.getElementById(`psm${i}t`).value; let a=+document.getElementById(`psm${i}a`).value; psmTxt += `${n} : ${t}/${a}/${t>0?(a/t*100).toFixed(0):0}%\n`; }
+  var targetTF = Math.round((+document.getElementById('targetMTD').value||0) * (+document.getElementById('timeFactor').value||0) / 100);
+  var achieve = (+document.getElementById('targetMTD').value > 0)? ((+document.getElementById('actual').value||0) / (+document.getElementById('targetMTD').value) * 100).toFixed(2) : 0;
+  var achTF = (targetTF > 0)? ((+document.getElementById('actual').value||0) / targetTF * 100).toFixed(2) : 0;
+  var memberPct = ((+document.getElementById('totalReceipt').value||0) > 0)? ((+document.getElementById('memberReceipt').value||0) / (+document.getElementById('totalReceipt').value) * 100).toFixed(0) : 0;
+
+  var wa = `REPORT SALES HARIAN\nPERIODE : ${formatDate(document.getElementById('period').value)}\nWH : ${document.getElementById('wh').value}\nAM : ${document.getElementById('am').value}\nAC : ${document.getElementById('ac').value}\nKD Toko : ${document.getElementById('storeCode').value}\nNama Toko : ${document.getElementById('storeName').value}\nShift : ${document.getElementById('shift').value}\n======================\n\n*REVENUE*\n- Time factor: ${document.getElementById('timeFactor').value}%\n- TARGET MTD :${formatRp(document.getElementById('targetMTD').value)}\n- Target Time Factor:
