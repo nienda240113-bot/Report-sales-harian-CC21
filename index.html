@@ -3,46 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TES LOGIN CC21</title>
+<title>Report Sales Harian CC21</title>
 <style>
-body{font-family:Arial;background:#f4f4f4;padding:20px}
-.box{max-width:400px;margin:50px auto;background:#fff;padding:20px;border-radius:12px}
-input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #ccc;font-size:16px}
-button{background:#2563eb;color:#fff;border:none;font-weight:bold}
-.hidden{display:none}
-</style>
-</head>
-<body>
-
-<div id="login" class="box">
-  <h2>TES LOGIN</h2>
-  <input id="kode" placeholder="KODE TOKO: CC21" style="text-transform:uppercase">
-  <input id="nama" placeholder="NAMA SALES">
-  <button onclick="masuk()">MASUK</button>
-  <p id="err" style="color:red"></p>
-</div>
-
-<div id="app" class="box hidden">
-  <h2>BERHASIL LOGIN!</h2>
-  <p id="who"></p>
-  <p>Kalau ini muncul berarti login aman. Tinggal kita tambahin form nya lagi</p>
-</div>
-
-<script>
-const TOKO = {"CC21":"TOKO CC21 KUTN","C624":"TOKO C624"};
-
-function masuk(){
-  const k = document.getElementById('kode').value.trim().toUpperCase();
-  const n = document.getElementById('nama').value.trim();
-  document.getElementById('err').innerText = '';
-
-  if(!k ||!n){ document.getElementById('err').innerText = 'Isi semua'; return; }
-  if(!TOKO[k]){ document.getElementById('err').innerText = 'Kode tidak ada: ' + k; return; }
-
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('who').innerText = TOKO[k] + ' - ' + n;
-}
-</script>
-</body>
-</html>
+body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
+.login-box,.app-box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h2{text-align:center;margin:0 0 10px;font-size:18px}
+h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
+label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
+input,select,button,textarea{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px}
+button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold}
+button:hover{background:#1d4ed8}
+button.green{background:#16a34a}
+button.whatsapp{background:#25
