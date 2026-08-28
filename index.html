@@ -1,16 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TEST</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Sales Harian</title>
 <style>
-body{padding:20px;font-family:Arial}
-button{width:100%;padding:20px;font-size:18px;background:green;color:white;border:none;border-radius:10px}
+body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
+.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px}
+h2{text-align:center}
+label{display:block;margin-top:8px;font-weight:bold}
+input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px;box-sizing:border-box}
+button{background:#2563eb;color:#fff;border:none;margin-top:12px;font-weight:bold}
+.whatsapp{background:#25D366}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hidden{display:none}
+.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px}
+@media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
-<h2>TEST LOGIN</h2>
-<input id="kode" placeholder="Ketik CC21" style="width:100%;padding:12px;font-size:16px">
-<button onclick="alert('BERHASIL! Kode kamu: '+document.getElementById('kode').value)">CEK</button>
-</body>
-</html>
+
+<div id="loginScreen" class="box">
+  <h2>Login Sales</h2>
+  <label>Kode Toko</label>
+  <input id="storeCodeLogin" type="text" placeholder="CC21" style="text-transform:uppercase" />
+  <label>Nama Sales</label>
+  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
+  <button onclick="login()">MASUK</button>
+  <p id="loginError" style="color:red;text-align:center"></p>
+</div>
+
+<div id="app" class="box hidden">
+  <h2>REPORT SALES HARIAN</h2>
+  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold"></p>
+
+  <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
+  <div class="grid"><div><label>WH</label><input id="wh" value="Bekasi"></div><div><label>AM</label><input id="am" value="Syahrul"></div></div>
+  <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div><div><label>KD Toko</label><input id="storeCode" readonly></div></div>
+  <label>Nama Toko</label><input id="storeName" readonly>
+
+  <h3>*REVENUE*</h3>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="0"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="0"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="0"></div></div>
+
+  <h3>*FOKUS CABANG*</h3>
+  <div class="section">
+    <div class="row"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
+    <div class="row"><span>TEBUS MURAH</span><input id="tm_t" type="number" value="0"><input id="tm_s" type="number" value="0"><input id="tm_o" type="number" value="0"></div>
+    <div class="row"><span>SERBA GRATIS</span><input id="sg_t" type="number" value="0"><input id="sg_s" type="number" value="0"><input id="sg_o" type="number" value="0"></div>
+    <div class="row"><span>SEUUGER</span><input id="seu_t" type="number" value="0"><input id="seu_s" type="number" value="0"><input id="seu_o" type="number" value="0"></div>
+    <div class="row"><span>PROMO CEBAN</span><input id="pc
