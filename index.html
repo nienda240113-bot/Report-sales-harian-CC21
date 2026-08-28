@@ -2,29 +2,33 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21 FINAL WA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Report CC21">
+<title>Report Sales Harian CC21</title>
+<link rel="apple-touch-icon" href="https://img.icons8.com/color/192/report-card.png">
 <style>
-body{font-family:Arial;background:#f4f4f4;margin:0;padding:16px}
-.login-box,.app-box{max-width:850px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-h2{text-align:center;margin:0 0 10px}
-h3{margin-top:20px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:16px}
-label{display:block;margin-top:10px;font-weight:bold;font-size:14px}
-input,select,button,textarea{width:100%;padding:10px;margin-top:4px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;font-size:14px}
-button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold}
+* {box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;background:#f4f4f4;margin:0;padding:12px}
+.login-box,.app-box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h2{text-align:center;margin:0 0 10px;font-size:18px}
+h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
+label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
+input,select,button,textarea{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px} /* 16px biar ga zoom di iPhone */
+button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold;min-height:44px}
 button:hover{background:#1d4ed8}
 button.green{background:#16a34a}
-button.green:hover{background:#15803d}
 button.whatsapp{background:#25D366}
-button.whatsapp:hover{background:#1ebe5d}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .status{margin-top:12px;text-align:center;font-size:14px;font-weight:bold}
 .hidden{display:none}
-.section{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}
-.small-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:center;font-size:13px}
-.small-grid b{text-align:center}
-textarea{height:400px;font-family:monospace;white-space:pre;background:#e7f3e8}
-.preview-box{background:#dcf8c6;padding:15px;border-radius:10px;margin-top:10px;border:1px solid #25D366;white-space:pre-wrap;font-family:monospace;font-size:13px}
+.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px;overflow-x:auto}
+.small-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;align-items:center;font-size:12px}
+.small-grid input{padding:6px;font-size:13px}
+.preview-box{background:#dcf8c6;padding:12px;border-radius:10px;margin-top:10px;border:1px solid #25D366;white-space:pre-wrap;font-family:monospace;font-size:12px;max-height:400px;overflow-y:auto}
+@media (max-width: 600px){ .grid{grid-template-columns:1fr} } /* 1 kolom di HP kecil */
 </style>
 </head>
 <body>
@@ -32,15 +36,15 @@ textarea{height:400px;font-family:monospace;white-space:pre;background:#e7f3e8}
 <div id="loginScreen" class="login-box">
   <h2>Login Sales</h2>
   <label>Kode Toko</label>
-  <input id="storeCodeLogin" type="text" placeholder="Contoh: CC21" style="text-transform:uppercase" />
+  <input id="storeCodeLogin" type="text" placeholder="Contoh: CC21" style="text-transform:uppercase" autocomplete="off" />
   <label>Nama Sales</label>
-  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
+  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" autocomplete="name" />
   <button id="loginBtn">MASUK</button>
 </div>
 
 <div id="app" class="app-box hidden">
   <h2>REPORT SALES HARIAN</h2>
-  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold"></p>
+  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold;font-size:13px"></p>
   
   <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
   <div class="grid"><div><label>WH</label><input id="wh" type="text" value="Bekasi"></div><div><label>AM</label><input id="am" type="text" value="Syahrul"></div></div>
@@ -48,38 +52,38 @@ textarea{height:400px;font-family:monospace;white-space:pre;background:#e7f3e8}
   <label>Nama Toko</label><input id="storeName" type="text" readonly>
 
   <h3>*REVENUE*</h3>
-  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" step="0.01" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="345059891"></div></div>
-  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="4646000"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="25000"></div></div>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" step="0.01" inputmode="decimal"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" inputmode="numeric"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" inputmode="numeric"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" inputmode="numeric"></div></div>
 
   <h3>*FOKUS CABANG*</h3>
   <div class="section">
-    <div class="small-grid"><b>Nama</b><b>Target</b><b>Sales</b><b>On Hand</b></div>
-    <div class="small-grid"><span>TEBUS MURAH (QTY REDEEM)</span><input id="tm_target" value="20"><input id="tm_sales" value="21"><input id="tm_oh" value="0"></div>
-    <div class="small-grid"><span>SERBA GRATIS (PAKET)</span><input id="sg_target" value="17"><input id="sg_sales" value="8"><input id="sg_oh" value="0"></div>
-    <div class="small-grid"><span>SEUUGER</span><input id="seu_target" value="40"><input id="seu_sales" value="4"><input id="seu_oh" value="0"></div>
-    <div class="small-grid"><span>PROMO CEBAN</span><input id="pc_target" value="69"><input id="pc_sales" value="1"><input id="pc_oh" value="0"></div>
+    <div class="small-grid"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
+    <div class="small-grid"><span>TEBUS MURAH</span><input id="tm_target" type="number"><input id="tm_sales" type="number"><input id="tm_oh" type="number"></div>
+    <div class="small-grid"><span>SERBA GRATIS</span><input id="sg_target" type="number"><input id="sg_sales" type="number"><input id="sg_oh" type="number"></div>
+    <div class="small-grid"><span>SEUUGER</span><input id="seu_target" type="number"><input id="seu_sales" type="number"><input id="seu_oh" type="number"></div>
+    <div class="small-grid"><span>PROMO CEBAN</span><input id="pc_target" type="number"><input id="pc_sales" type="number"><input id="pc_oh" type="number"></div>
   </div>
 
   <h3>*MEMBER*</h3>
-  <div class="grid"><div><label>Actual NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="47"></div></div>
-  <label>Total STRUK</label><input id="totalReceipt" type="number" value="69">
+  <div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number"></div></div>
+  <label>Total STRUK</label><input id="totalReceipt" type="number">
 
-  <h3>*PSM (In Qty)* - NAMA BISA DI EDIT</h3>
+  <h3>*PSM (In Qty)*</h3>
   <div class="section">
     <div class="small-grid"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>
-    <div class="small-grid"><input id="psm1n" value="Le mineral"><input id="psm1t" value="210"><input id="psm1a" value="8"><input id="psm1p" readonly></div>
-    <div class="small-grid"><input id="psm2n" value="Nescafe"><input id="psm2t" value="75"><input id="psm2a" value="6"><input id="psm2p" readonly></div>
-    <div class="small-grid"><input id="psm3n" value="Happy tos"><input id="psm3t" value="33"><input id="psm3a" value="1"><input id="psm3p" readonly></div>
-    <div class="small-grid"><input id="psm4n" value="Sedaap"><input id="psm4t" value="66"><input id="psm4a" value="10"><input id="psm4p" readonly></div>
-    <div class="small-grid"><input id="psm5n" value="Roma"><input id="psm5t" value="45"><input id="psm5a" value="3"><input id="psm5p" readonly></div>
-    <div class="small-grid"><input id="psm6n" value="Rinso"><input id="psm6t" value="17"><input id="psm6a" value="18"><input id="psm6p" readonly></div>
-    <div class="small-grid"><input id="psm7n" value="Kahf"><input id="psm7t" value="24"><input id="psm7a" value="0"><input id="psm7p" readonly></div>
-    <div class="small-grid"><input id="psm8n" value="H&S"><input id="psm8t" value="12"><input id="psm8a" value="0"><input id="psm8p" readonly></div>
-    <div class="small-grid"><input id="psm9n" value="Colagena"><input id="psm9t" value="55"><input id="psm9a" value="0"><input id="psm9p" readonly></div>
+    <div class="small-grid"><input id="psm1n" value="Le mineral"><input id="psm1t" type="number"><input id="psm1a" type="number"><input id="psm1p" readonly></div>
+    <div class="small-grid"><input id="psm2n" value="Nescafe"><input id="psm2t" type="number"><input id="psm2a" type="number"><input id="psm2p" readonly></div>
+    <div class="small-grid"><input id="psm3n" value="Happy tos"><input id="psm3t" type="number"><input id="psm3a" type="number"><input id="psm3p" readonly></div>
+    <div class="small-grid"><input id="psm4n" value="Sedaap"><input id="psm4t" type="number"><input id="psm4a" type="number"><input id="psm4p" readonly></div>
+    <div class="small-grid"><input id="psm5n" value="Roma"><input id="psm5t" type="number"><input id="psm5a" type="number"><input id="psm5p" readonly></div>
+    <div class="small-grid"><input id="psm6n" value="Rinso"><input id="psm6t" type="number"><input id="psm6a" type="number"><input id="psm6p" readonly></div>
+    <div class="small-grid"><input id="psm7n" value="Kahf"><input id="psm7t" type="number"><input id="psm7a" type="number"><input id="psm7p" readonly></div>
+    <div class="small-grid"><input id="psm8n" value="H&S"><input id="psm8t" type="number"><input id="psm8a" type="number"><input id="psm8p" readonly></div>
+    <div class="small-grid"><input id="psm9n" value="Colagena"><input id="psm9t" type="number"><input id="psm9a" type="number"><input id="psm9p" readonly></div>
   </div>
 
-  <h3>*CATEGORY (Rupiah)*</h3>
-  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
+  <h3>*CATEGORY*</h3>
+  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number"></div></div>
 
   <button id="saveBtn">💾 Simpan Data</button>
   <button id="previewBtn" class="green">👀 Preview WhatsApp</button>
@@ -89,70 +93,9 @@ textarea{height:400px;font-family:monospace;white-space:pre;background:#e7f3e8}
   <div id="previewWrap" class="hidden">
     <h3>Preview Pesan WA</h3>
     <div id="waPreview" class="preview-box"></div>
-    <textarea id="waOutput" readonly></textarea>
   </div>
 </div>
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
-const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
-const STORE_LIST = {"C624":"TOKO C624","C560":"TOKO C560","CH81":"TOKO CH81","CG76":"TOKO CG76","C573":"TOKO C573","CE47":"TOKO CE47","CA71":"TOKO CA71","CI30":"TOKO CI30","CH41":"TOKO CH41","CG54":"TOKO CG54","C935":"TOKO C935","C965":"TOKO C965","CG86":"TOKO CG86","CA94":"TOKO CA94","C574":"TOKO C574","CI15":"TOKO CI15","CI54":"TOKO CI54","CF50":"TOKO CF50","CC21":"TOKO CC21 KUTN","CI84":"TOKO CI84"};
-let state = { user: null, lastData: null };
-
-document.getElementById('loginBtn').onclick = login;
-document.getElementById('saveBtn').onclick = saveReport;
-document.getElementById('previewBtn').onclick = previewWA;
-document.getElementById('waBtn').onclick = kirimWA;
-for(let i=1;i<=9;i++) document.getElementById(`psm${i}t`).oninput = calcPSM, document.getElementById(`psm${i}a`).oninput = calcPSM;
-
-function login(){ 
-  const code = document.getElementById('storeCodeLogin').value.trim().toUpperCase(); 
-  const nama = document.getElementById('namaSalesLogin').value.trim(); 
-  if(!code ||!nama) return alert("Isi Kode Toko dan Nama Sales"); 
-  if(!STORE_LIST[code]) return alert("Kode Toko tidak terdaftar"); 
-  state.user = { code: code, storeName: STORE_LIST[code], namaSales: nama }; 
-  document.getElementById('loginScreen').classList.add('hidden'); 
-  document.getElementById('app').classList.remove('hidden'); 
-  document.getElementById('who').textContent = `${state.user.storeName} - ${state.user.namaSales}`; 
-  document.getElementById('storeCode').value = code; 
-  document.getElementById('storeName').value = STORE_LIST[code]; 
-  document.getElementById('period').value = new Date().toISOString().slice(0,10); 
-  calcPSM();
-}
-
-function calcPSM(){
-  for(let i=1;i<=9;i++){
-    let t=+document.getElementById(`psm${i}t`).value;
-    let a=+document.getElementById(`psm${i}a`).value;
-    document.getElementById(`psm${i}p`).value = t>0? (a/t*100).toFixed(0)+'%' : '0%';
-  }
-}
-
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-function formatRp(n){return 'Rp '+Number(n).toLocaleString('id-ID')}
-function formatDate(d){const opt={day:'2-digit',month:'long'}; return new Date(d).toLocaleDateString('id-ID',opt)}
-
-function getData(){
-  const targetTF = Math.round(+targetMTD.value * +timeFactor.value / 100);
-  const achieve = (+actual.value / +targetMTD.value * 100).toFixed(2);
-  const achTF = (+actual.value / targetTF * 100).toFixed(2);
-  const gap = +targetMTD.value - +actual.value;
-  const gapTF = targetTF - +actual.value;
-  const memberPct = (+memberReceipt.value / +totalReceipt.value * 100).toFixed(0);
-
-  return {
-    period: period.value, wh: wh.value, am: am.value, ac: ac.value, shift: shift.value,
-    storeCode: state.user.code, storeName: state.user.storeName,
-    timeFactor: +timeFactor.value, targetMTD: +targetMTD.value, targetTF, actual: +actual.value, achieve, achTF, gap, gapTF,
-    newMember: +newMember.value, memberReceipt: +memberReceipt.value, totalReceipt: +totalReceipt.value, memberPct,
-    toys: +toys.value, hbpl: +hbpl.value, feeBase: +feeBase.value,
-    fokus: {tm:[+tm_target.value,+tm_sales.value,+tm_oh.value], sg:[+sg_target.value,+sg_sales.value,+sg_oh.value], seu:[+seu_target.value,+seu_sales.value,+seu_oh.value], pc:[+pc_target.value,+pc_sales.value,+pc_oh.value]},
-    psm: [
-      [psm1n.value,+psm1t.value,+psm1a.value],[psm2n.value,+psm2t.value,+psm2a.value],[psm3n.value,+psm3t.value,+psm3a.value],
-      [psm4n.value,+psm4t.value,+psm4a.value],[psm5n.value,+psm5t.value,+psm5a.value],[psm6n.value,+psm6t.value,+psm6a.value],
-      [psm7n.value,+psm7t.value,+psm7a.value],[psm8n.value,+psm8t.value,+psm8a.value],[psm9n.value,+psm9t.value,+psm9a.value]
-    ]
-  };
-}
-
-function generateWA
+const API_TOKEN = 'bc318b0a8cb4498
