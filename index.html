@@ -6,19 +6,16 @@
 <title>Report Sales Harian</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
-.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-h2{text-align:center;margin:0 0 10px;font-size:18px}
-h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
-label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
+.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px}
+h2{text-align:center}
+label{display:block;margin-top:8px;font-weight:bold}
 input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px;box-sizing:border-box}
-button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold}
-button.whatsapp{background:#25D366}
+button{background:#2563eb;color:#fff;border:none;margin-top:12px;font-weight:bold}
+.whatsapp{background:#25D366}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hidden{display:none}
 .section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
-.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;align-items:center;font-size:12px;margin-bottom:4px}
-.row input{padding:6px;font-size:13px}
-#status{text-align:center;margin-top:10px;font-weight:bold}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px}
 @media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
@@ -27,7 +24,7 @@ button.whatsapp{background:#25D366}
 <div id="loginScreen" class="box">
   <h2>Login Sales</h2>
   <label>Kode Toko</label>
-  <input id="storeCodeLogin" type="text" placeholder="Contoh: CC21" style="text-transform:uppercase" />
+  <input id="storeCodeLogin" type="text" placeholder="CC21" style="text-transform:uppercase" />
   <label>Nama Sales</label>
   <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
   <button id="loginBtn">MASUK</button>
@@ -36,7 +33,7 @@ button.whatsapp{background:#25D366}
 
 <div id="app" class="box hidden">
   <h2>REPORT SALES HARIAN</h2>
-  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold;font-size:13px"></p>
+  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold"></p>
 
   <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
   <div class="grid"><div><label>WH</label><input id="wh" value="Bekasi"></div><div><label>AM</label><input id="am" value="Syahrul"></div></div>
@@ -44,8 +41,8 @@ button.whatsapp{background:#25D366}
   <label>Nama Toko</label><input id="storeName" readonly>
 
   <h3>*REVENUE*</h3>
-  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="345059891"></div></div>
-  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="0"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="25000"></div></div>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="0"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="0"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="0"></div></div>
 
   <h3>*FOKUS CABANG*</h3>
   <div class="section">
@@ -57,72 +54,4 @@ button.whatsapp{background:#25D366}
   </div>
 
   <h3>*MEMBER*</h3>
-  <div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="0"></div></div>
-  <label>Total STRUK</label><input id="totalReceipt" type="number" value="0">
-
-  <h3>*PSM (In Qty)*</h3>
-  <div class="section" id="psmSection"></div>
-
-  <h3>*CATEGORY*</h3>
-  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
-
-  <button id="kirimBtn" class="whatsapp">📲 1 KLIK: SIMPAN + KIRIM KE WA</button>
-  <div id="status"></div>
-</div>
-
-<script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
-const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
-const STORE_LIST = {"C624":"RWBT","C560":"RAJ","CH81":"CDKS","CG76":"SPMM","C573":"GMM","CE47":"MKRI","CI30":"STTD","CH41":"KPMRK","CG54":"MM2100","C935":"TLJ2","CA71":"WSGN","C965":"CBNU","CG86":"JKST","CA94":"KPTI","C574":"SKU","CI15":"RPSU","CI54":"RJLB","CF50":"DNIA","CC21":"KUTN","CI84":"TLKW"};
-const PSM_DEFAULT = [["Le mineral",0,0],["Nescafe",0,0],["Happy tos",0,0],["Sedaap",0,0],["Roma",0,0],["Rinso",0,0],["Kahf",0,0],["H&S",0,0],["Colagena",0,0]];
-let user = null;
-
-// PENTING: PAKE CARA INI BIAR GA ERROR DI HP
-document.getElementById('loginBtn').addEventListener('click', login);
-document.getElementById('kirimBtn').addEventListener('click', kirimSemua);
-
-function login(){
-  document.getElementById('loginError').innerText = '';
-  const code = document.getElementById('storeCodeLogin').value.trim().toUpperCase();
-  const nama = document.getElementById('namaSalesLogin').value.trim();
-  if(!code ||!nama){ document.getElementById('loginError').innerText = 'Isi semua'; return; }
-  if(!STORE_LIST[code]){ document.getElementById('loginError').innerText = 'Kode tidak ada: ' + code; return; }
-  user = { code, storeName: STORE_LIST[code], namaSales: nama };
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('who').textContent = `TOKO ${code} ${user.storeName} - ${user.namaSales}`;
-  document.getElementById('storeCode').value = code;
-  document.getElementById('storeName').value = user.storeName;
-  document.getElementById('period').value = new Date().toISOString().slice(0,10);
-  buildPSM();
-}
-
-function buildPSM(){
-  let html = '<div class="row"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>';
-  PSM_DEFAULT.forEach((p,i)=>{
-    html += `<div class="row"><input id="psm${i}n" value="${p[0]}"><input id="psm${i}t" type="number" value="${p[1]}"><input id="psm${i}a" type="number" value="${p[2]}"><input id="psm${i}p" readonly></div>`
-  });
-  document.getElementById('psmSection').innerHTML = html;
-  for(let i=0;i<9;i++){ document.getElementById(`psm${i}t`).oninput = calcPSM; document.getElementById(`psm${i}a`).oninput = calcPSM; }
-}
-function calcPSM(){ for(let i=0;i<9;i++){ let t=+document.getElementById(`psm${i}t`).value||0; let a=+document.getElementById(`psm${i}a`).value||0; document.getElementById(`psm${i}p`).value = t>0? (a/t*100).toFixed(0)+'%' : '0%'; }
-
-function formatRp(n){return 'Rp '+Number(n||0).toLocaleString('id-ID')}
-function formatDate(d){return new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'long'})}
-
-function getData(){
-  let psm = []; for(let i=0;i<9;i++) psm.push([document.getElementById(`psm${i}n`).value,+document.getElementById(`psm${i}t`).value,+document.getElementById(`psm${i}a`).value]);
-  const targetTF = Math.round((+targetMTD.value||0) * (+timeFactor.value||0) / 100);
-  const achieve = (+targetMTD.value > 0)? ((+actual.value||0) / (+targetMTD.value) * 100).toFixed(2) : 0;
-  const achTF = (targetTF > 0)? ((+actual.value||0) / targetTF * 100).toFixed(2) : 0;
-  const memberPct = ((+totalReceipt.value||0) > 0)? ((+memberReceipt.value||0) / (+totalReceipt.value) * 100).toFixed(0) : 0;
-  return { period: period.value, wh: wh.value, am: am.value, ac: ac.value, shift: shift.value, storeCode: user.code, storeName: user.storeName, timeFactor: +timeFactor.value, targetMTD: +targetMTD.value, targetTF, actual: +actual.value, achieve, achTF, gap:(+targetMTD.value||0)-(+actual.value||0), gapTF:targetTF-(+actual.value||0), newMember: +newMember.value, memberReceipt: +memberReceipt.value, totalReceipt: +totalReceipt.value, memberPct, toys: +toys.value, hbpl: +hbpl.value, feeBase: +feeBase.value, fokus: {tm:[+tm_t.value,+tm_s.value,+tm_o.value], sg:[+sg_t.value,+sg_s.value,+sg_o.value], seu:[+seu_t.value,+seu_s.value,+seu_o.value], pc:[+pc_t.value,+pc_s.value,+pc_o.value]}, psm };
-}
-
-function generateWA(d){ return `REPORT SALES HARIAN\nPERIODE : ${formatDate(d.period)}\nWH : ${d.wh}\nAM : ${d.am}\nAC : ${d.ac}\nKD Toko : ${d.storeCode}\nNama Toko : ${d.storeName}\nShift : ${d.shift}\n======================\n\n*REVENUE*\n1. NET SALES\n- Time factor: ${d.timeFactor}%\n- TARGET MTD :${formatRp(d.targetMTD)}\n- Target Time Factor: ${formatRp(d.targetTF)}\n- ACTUAL :${formatRp(d.actual)}\n- ACHIVE MTD:${d.achieve}%\n- AChieved Time Factor :${d.achTF}%\n- GAP TO TARGET :${formatRp(d.gap)}\n- GAP To Time Factor:${formatRp(d.gapTF)}\n\n*FOKUS CABANG*\n======================\nTARGET/SALES/ACV%/ON HAND\n1. TEBUS MURAH (QTY REDEEM) :${d.fokus.tm[0]}/${d.fokus.tm[1]}/${(d.fokus.tm[1]/d.fokus.tm[0]*100).toFixed(0)}%/${d.fokus.tm[2]}\n2. SERBA GRATIS (PAKET) :${d.fokus.sg[0]}/${d.fokus.sg[1]}/${(d.fokus.sg[1]/d.fokus.sg[0]*100).toFixed(0)}%/${d.fokus.sg[2]}\n3. SEUUGER :${d.fokus.seu[0]}/${d.fokus.seu[1]}/${(d.fokus.seu[1]/d.fokus.seu[0]*100).toFixed(0)}%/${d.fokus.seu[2]}\n4. PROMO CEBAN :${d.fokus.pc[0]}/${d.fokus.pc[1]}/${(d.fokus.pc[1]/d.fokus.pc[0]*100).toFixed(0)}%/${d.fokus.pc[2]}\n======================\n*MEMBER*\n1. Actual NEW MEMBER :${d.newMember}\n2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${d.memberReceipt}/${d.totalReceipt}/${d.memberPct}%\n======================\n*PSM*(In Qty).\n( Target - actual - %)\n${d.psm.map(p=>`${p[0]} : ${p[1]}/${p[2]}/${p[1]>0?(p[2]/p[1]*100).toFixed(0):0}%`).join('\n')}\n======================\n*CATEGORY* (Rupiah)\n1. TOYS (NS) : ${formatRp(d.toys)}\n2. HBPL (NS) : ${formatRp(d.hbpl)}\n======================\n*E-COMMERCE*\n1. FEE BASE (RP) : ${formatRp(d.feeBase)}\n\nTerimakasih`; }
-
-function kirimSemua(){ const data = getData(); document.getElementById('status').innerHTML = '⏳ Menyimpan ke Sheet...'; callAPI('save', {data: JSON.stringify({...data,id:Date.now(),Timestamp:new Date()})}, res => { if(res.ok){ document.getElementById('status').innerHTML = '🟢 Tersimpan! Buka WA...'; const wa = generateWA(data); window.open(`https://wa.me/?text=${encodeURIComponent(wa)}`, '_blank'); } else { document.getElementById('status').innerHTML = '🔴 Gagal Simpan: '+res.error; } }); }
-function callAPI(action, params, cb){ params.action = action; params.token = API_TOKEN; const callback = 'cb_'+Date.now(); window[callback] = cb; params.callback = callback; const s = document.createElement('script'); s.src = API_URL+'?'+new URLSearchParams(params).toString(); document.head.appendChild(s); }
-</script>
-</body>
-</html>
+  <div class
