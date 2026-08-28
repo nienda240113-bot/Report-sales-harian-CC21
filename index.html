@@ -6,89 +6,35 @@
 <title>Report Sales Harian</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
-.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px}
-h2{text-align:center}
-label{display:block;margin-top:8px;font-weight:bold}
+.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h2{text-align:center;margin:0 0 10px}
+h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
+label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
 input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px;box-sizing:border-box}
-button{background:#2563eb;color:#fff;border:none;margin-top:12px;font-weight:bold}
-.whatsapp{background:#25D366}
+button{background:#25D366;color:#fff;border:none;margin-top:15px;font-weight:bold;font-size:16px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hidden{display:none}
+.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px}
 @media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
-<div id="loginScreen" class="box">
-  <h2>Login Sales</h2>
-  <label>Kode Toko</label>
-  <input id="storeCodeLogin" type="text" placeholder="CC21" style="text-transform:uppercase" />
-  <label>Nama Sales</label>
-  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
-  <button onclick="login()">MASUK</button>
-  <p id="loginError" style="color:red;text-align:center"></p>
-</div>
-
-<div id="app" class="box hidden">
+<div class="box">
   <h2>REPORT SALES HARIAN</h2>
-  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold"></p>
 
   <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
   <div class="grid"><div><label>WH</label><input id="wh" value="Bekasi"></div><div><label>AM</label><input id="am" value="Syahrul"></div></div>
-  <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div><div><label>KD Toko</label><input id="storeCode" readonly></div></div>
-  <label>Nama Toko</label><input id="storeName" readonly>
-
-  <label>ACTUAL Rp</label><input id="actual" type="number" value="0">
-  <button class="whatsapp" onclick="kirimWA()">📲 KIRIM KE WA</button>
-</div>
-
-<script>
-function login(){
-  var code = document.getElementById('storeCodeLogin').value;
-  code = code.toUpperCase();
-  var nama = document.getElementById('namaSalesLogin').value;
-  document.getElementById('loginError').innerText = '';
+  <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div></div>
   
-  if(code == "" || nama == ""){ 
-    document.getElementById('loginError').innerText = 'Isi semua'; 
-    return; 
-  }
+  <div class="grid"><div><label>KD Toko</label><input id="storeCode" placeholder="CC21" style="text-transform:uppercase"></div><div><label>Nama Toko</label><input id="storeName" placeholder="KUTN"></div></div>
+  <small style="color:gray">Isi KD Toko: C624,RWBT C560,RAJ CH81,CDKS CG76,SPMM C573,GMM CE47,MKRI CI30,STTD CH41,KPMRK CG54,MM2100 C935,TLJ2 CA71,WSGN C965,CBNU CG86,JKST CA94,KPTI C574,SKU CI15,RPSU CI54,RJLB CF50,DNIA CC21,KUTN CI84,TLKW</small>
 
-  var storeName = "";
-  if(code == "CC21"){storeName = "KUTN"}
-  else if(code == "C624"){storeName = "RWBT"}
-  else if(code == "C560"){storeName = "RAJ"}
-  else if(code == "CH81"){storeName = "CDKS"}
-  else if(code == "CG76"){storeName = "SPMM"}
-  else if(code == "C573"){storeName = "GMM"}
-  else if(code == "CE47"){storeName = "MKRI"}
-  else if(code == "CI30"){storeName = "STTD"}
-  else if(code == "CH41"){storeName = "KPMRK"}
-  else if(code == "CG54"){storeName = "MM2100"}
-  else if(code == "C935"){storeName = "TLJ2"}
-  else if(code == "CA71"){storeName = "WSGN"}
-  else if(code == "C965"){storeName = "CBNU"}
-  else if(code == "CG86"){storeName = "JKST"}
-  else if(code == "CA94"){storeName = "KPTI"}
-  else if(code == "C574"){storeName = "SKU"}
-  else if(code == "CI15"){storeName = "RPSU"}
-  else if(code == "CI54"){storeName = "RJLB"}
-  else if(code == "CF50"){storeName = "DNIA"}
-  else if(code == "CI84"){storeName = "TLKW"}
-  else{ 
-    document.getElementById('loginError').innerText = 'Kode tidak ada: ' + code; 
-    return; 
-  }
+  <h3>*REVENUE*</h3>
+  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="0"></div></div>
+  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="0"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="0"></div></div>
 
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('who').innerText = 'TOKO ' + code + ' + storeName + ' - ' + nama;
-  document.getElementById('storeCode').value = code;
-  document.getElementById('storeName').value = storeName;
-  document.getElementById('period').value = new Date().toISOString().slice(0,10);
-}
-
-function kirimWA(){
-  var wa = "REPORT SALES HARIAN\n" +
-  "PERIODE : " + document.getElementById('period').value + "\n" +
-  "KD Toko : " + document.getElementById('storeCode').value + "\
+  <h3>*FOKUS CABANG*</h3>
+  <div class="section">
+    <div class="row"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
+    <div class="row"><span>TEBUS MURAH</span><input id="tm_t" type="number" value="0"><input id="tm_s" type="number" value="0"><input id="tm_o"
