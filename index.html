@@ -3,92 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian</title>
+<title>Report Sales Harian CC21</title>
 <style>
-body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
-.box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px}
-h2{text-align:center} h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
-label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
-input,select,button{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px;box-sizing:border-box}
-button{background:#2563eb;color:#fff;border:none;margin-top:10px;font-weight:bold}
-.btn-wa{background:#25D366}.btn-preview{background:#f59e0b}
+body{font-family:Arial;background:#eef2ff;margin:0;padding:12px}
+.box{max-width:800px;margin:10px auto;background:#fff;padding:16px;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+h2{text-align:center;margin:0 0 8px;color:#2563eb}
+h3{margin:16px 0 8px;border-left:4px solid #2563eb;padding-left:8px;font-size:14px}
+label{display:block;margin-top:8px;font-weight:600;font-size:13px}
+input,select,button,textarea{width:100%;padding:12px;margin-top:4px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box}
+button{background:#25D366;color:#fff;border:none;margin-top:12px;font-weight:bold;cursor:pointer}
+.btn2{background:#2563eb}.btn3{background:#f59e0b}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
+.section{background:#f8fafc;padding:10px;border-radius:8px}
 .row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:4px;align-items:center}
-#previewBox{white-space:pre-wrap;background:#000;color:#0f0;padding:10px;border-radius:8px;display:none;margin-top:10px;font-size:12px}
+.row input{padding:6px}
+#preview{white-space:pre-wrap;background:#111;color:#0f0;padding:12px;border-radius:8px;display:none;margin-top:10px;font-size:12px;max-height:300px;overflow:auto}
 @media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
-
 <div class="box">
   <h2>REPORT SALES HARIAN</h2>
-  <p id="status" style="text-align:center;color:green"></p>
 
   <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
   <div class="grid"><div><label>WH</label><input id="wh" value="Bekasi"></div><div><label>AM</label><input id="am" value="Syahrul"></div></div>
   <div class="grid"><div><label>AC</label><input id="ac" value="Triyanto"></div></div>
-  <div class="grid"><div><label>KD Toko</label><input id="storeCode" placeholder="CC21"></div><div><label>Nama Toko</label><input id="storeName" placeholder="KUTN"></div></div>
-
-  <h3>*REVENUE*</h3>
-  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="0"></div></div>
-  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="0"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="0"></div></div>
-
-  <h3>*FOKUS CABANG*</h3>
-  <div class="section"><div class="row"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
-  <div class="row"><span>TEBUS MURAH</span><input id="tm_t"><input id="tm_s"><input id="tm_o"></div>
-  <div class="row"><span>SERBA GRATIS</span><input id="sg_t"><input id="sg_s"><input id="sg_o"></div>
-  <div class="row"><span>SEUUGER</span><input id="seu_t"><input id="seu_s"><input id="seu_o"></div>
-  <div class="row"><span>PROMO CEBAN</span><input id="pc_t"><input id="pc_s"><input id="pc_o"></div></div>
-
-  <h3>*MEMBER*</h3><div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number"></div></div>
-  <label>Total STRUK</label><input id="totalReceipt" type="number">
-
-  <h3>*PSM & CATEGORY*</h3><div class="section" id="psmSection"></div>
-  <div class="grid"><div><label>TOYS</label><input id="toys" type="number"></div><div><label>HBPL</label><input id="hbpl" type="number"></div></div>
-
-  <button onclick="simpanData()">💾 SIMPAN KE SHEET</button>
-  <button class="btn-preview" onclick="previewWA()">👀 PREVIEW WA</button>
-  <button class="btn-wa" onclick="kirimWA()">📲 KIRIM KE WA</button>
-  <div id="previewBox"></div>
-</div>
-
-<script>
-// WAJIB GANTI INI DENGAN LINK APPS SCRIPT KAMU NANTI
-const API_URL = "https://script.google.com/macros/s/TARUH_URL_APPS_SCRIPT_DISINI/exec";
-
-const PSM = ["Le mineral","Nescafe","Happy tos","Sedaap","Roma","Rinso","Kahf","H&S","Colagena"];
-document.getElementById('period').value = new Date().toISOString().slice(0,10);
-buildPSM(); loadData();
-
-function buildPSM(){
-  let html = '<div class="row"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>';
-  PSM.forEach((p,i)=>{ html += `<div class="row"><span>${p}</span><input id="psm${i}t" type="number"><input id="psm${i}a" type="number"><input id="psm${i}p" readonly></div>` });
-  document.getElementById('psmSection').innerHTML = html;
-}
-
-function getData(){
-  let data = {period:period.value,shift:shift.value,wh:wh.value,am:am.value,ac:ac.value,storeCode:storeCode.value,storeName:storeName.value,timeFactor:timeFactor.value,targetMTD:targetMTD.value,actual:actual.value,feeBase:feeBase.value,tm_t:tm_t.value,tm_s:tm_s.value,tm_o:tm_o.value,sg_t:sg_t.value,sg_s:sg_s.value,sg_o:sg_o.value,seu_t:seu_t.value,seu_s:seu_s.value,seu_o:seu_o.value,pc_t:pc_t.value,pc_s:pc_s.value,pc_o:pc_o.value,newMember:newMember.value,memberReceipt:memberReceipt.value,totalReceipt:totalReceipt.value,toys:toys.value,hbpl:hbpl.value};
-  PSM.forEach((p,i)=>{ data[`psm${i}t`] = document.getElementById(`psm${i}t`).value; data[`psm${i}a`] = document.getElementById(`psm${i}a`).value; });
-  return data;
-}
-function setData(d){ for(let key in d){ if(document.getElementById(key)) document.getElementById(key).value = d[key]; } }
-
-function simpanData(){
-  fetch(API_URL, {method:'POST', body: JSON.stringify(getData())})
- .then(res=>res.json()).then(()=>{ document.getElementById('status').innerText = 'Tersimpan ke Sheet ✓'; setTimeout(()=>status.innerText='',3000) });
-}
-function loadData(){
-  fetch(API_URL+'?period='+period.value+'&store='+storeCode.value)
- .then(res=>res.json()).then(d=>{ if(d) setData(d); });
-}
-
-function buatPesan(){
-  let d = getData();
-  return `REPORT SALES HARIAN\nPERIODE : ${d.period}\nKD Toko : ${d.storeCode}\nNama Toko : ${d.storeName}\nACTUAL : Rp ${Number(d.actual).toLocaleString('id-ID')}\n...lengkap semua...`;
-}
-function previewWA(){ document.getElementById('previewBox').style.display='block'; document.getElementById('previewBox').innerText = buatPesan(); }
-function kirimWA(){ window.open("https://wa.me/?text=" + encodeURIComponent(buatPesan()), '_blank'); }
-</script>
-</body>
-</html>
+  
+  <div class="grid"><div><label>KD Toko</label><input id="storeCode" placeholder="CC21"></div><div><label>Nama Toko</label>
