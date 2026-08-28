@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21 FINAL PSM EDIT</title>
+<title>Report Sales Harian CC21 FINAL WA</title>
 <style>
 body{font-family:Arial;background:#f4f4f4;margin:0;padding:16px}
 .login-box,.app-box{max-width:850px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -15,13 +15,16 @@ button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;
 button:hover{background:#1d4ed8}
 button.green{background:#16a34a}
 button.green:hover{background:#15803d}
+button.whatsapp{background:#25D366}
+button.whatsapp:hover{background:#1ebe5d}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .status{margin-top:12px;text-align:center;font-size:14px;font-weight:bold}
 .hidden{display:none}
 .section{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}
 .small-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:center;font-size:13px}
 .small-grid b{text-align:center}
-textarea{height:400px;font-family:monospace;white-space:pre}
+textarea{height:400px;font-family:monospace;white-space:pre;background:#e7f3e8}
+.preview-box{background:#dcf8c6;padding:15px;border-radius:10px;margin-top:10px;border:1px solid #25D366;white-space:pre-wrap;font-family:monospace;font-size:13px}
 </style>
 </head>
 <body>
@@ -79,9 +82,15 @@ textarea{height:400px;font-family:monospace;white-space:pre}
   <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
 
   <button id="saveBtn">💾 Simpan Data</button>
-  <button id="copyBtn" class="green">📋 Copy Format WA</button>
+  <button id="previewBtn" class="green">👀 Preview WhatsApp</button>
+  <button id="waBtn" class="whatsapp">📲 Kirim ke WhatsApp</button>
+  
   <div id="status" class="status"></div>
-  <textarea id="waOutput" class="hidden" readonly></textarea>
+  <div id="previewWrap" class="hidden">
+    <h3>Preview Pesan WA</h3>
+    <div id="waPreview" class="preview-box"></div>
+    <textarea id="waOutput" readonly></textarea>
+  </div>
 </div>
 
 <script>
@@ -92,7 +101,8 @@ let state = { user: null, lastData: null };
 
 document.getElementById('loginBtn').onclick = login;
 document.getElementById('saveBtn').onclick = saveReport;
-document.getElementById('copyBtn').onclick = copyWA;
+document.getElementById('previewBtn').onclick = previewWA;
+document.getElementById('waBtn').onclick = kirimWA;
 for(let i=1;i<=9;i++) document.getElementById(`psm${i}t`).oninput = calcPSM, document.getElementById(`psm${i}a`).oninput = calcPSM;
 
 function login(){ 
@@ -122,7 +132,7 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 function formatRp(n){return 'Rp '+Number(n).toLocaleString('id-ID')}
 function formatDate(d){const opt={day:'2-digit',month:'long'}; return new Date(d).toLocaleDateString('id-ID',opt)}
 
-function saveReport(){ 
+function getData(){
   const targetTF = Math.round(+targetMTD.value * +timeFactor.value / 100);
   const achieve = (+actual.value / +targetMTD.value * 100).toFixed(2);
   const achTF = (+actual.value / targetTF * 100).toFixed(2);
@@ -130,7 +140,7 @@ function saveReport(){
   const gapTF = targetTF - +actual.value;
   const memberPct = (+memberReceipt.value / +totalReceipt.value * 100).toFixed(0);
 
-  state.lastData = {
+  return {
     period: period.value, wh: wh.value, am: am.value, ac: ac.value, shift: shift.value,
     storeCode: state.user.code, storeName: state.user.storeName,
     timeFactor: +timeFactor.value, targetMTD: +targetMTD.value, targetTF, actual: +actual.value, achieve, achTF, gap, gapTF,
@@ -143,68 +153,6 @@ function saveReport(){
       [psm7n.value,+psm7t.value,+psm7a.value],[psm8n.value,+psm8t.value,+psm8a.value],[psm9n.value,+psm9t.value,+psm9a.value]
     ]
   };
-
-  document.getElementById('status').innerHTML = '⏳ Menyimpan...';
-  callAPI('save', {data: JSON.stringify({...state.lastData,id:uid(),Timestamp:new Date()})}, res => {
-    document.getElementById('status').innerHTML = res.ok? '🟢 Tersimpan online' : '🔴 Gagal: '+res.error;
-  });
 }
 
-function copyWA(){
-  if(!state.lastData) return alert("Simpan Data dulu");
-  const d=state.lastData;
-  let wa = `REPORT SALES HARIAN
-PERIODE : ${formatDate(d.period)}
-WH : ${d.wh}
-AM : ${d.am}
-AC : ${d.ac}
-KD Toko : ${d.storeCode}
-Nama Toko : ${d.storeName}
-Shift : ${d.shift}
-======================
-
-*REVENUE*
-1. NET SALES
-- Time factor: ${d.timeFactor}%
-- TARGET MTD :${formatRp(d.targetMTD)}
-- Target Time Factor: ${formatRp(d.targetTF)}
-- ACTUAL :${formatRp(d.actual)}
-- ACHIVE MTD:${d.achieve}%
-- AChieved Time Factor :${d.achTF}%
-- GAP TO TARGET :${formatRp(d.gap)}
-- GAP To Time Factor:${formatRp(d.gapTF)}
-
-*FOKUS CABANG*
-======================
-TARGET/SALES/ACV%/ON HAND
-1. TEBUS MURAH (QTY REDEEM) :${d.fokus.tm[0]}/${d.fokus.tm[1]}/${(d.fokus.tm[1]/d.fokus.tm[0]*100).toFixed(0)}%/${d.fokus.tm[2]}
-2. SERBA GRATIS (PAKET) :${d.fokus.sg[0]}/${d.fokus.sg[1]}/${(d.fokus.sg[1]/d.fokus.sg[0]*100).toFixed(0)}%/${d.fokus.sg[2]}
-3. SEUUGER :${d.fokus.seu[0]}/${d.fokus.seu[1]}/${(d.fokus.seu[1]/d.fokus.seu[0]*100).toFixed(0)}%/${d.fokus.seu[2]}
-4. PROMO CEBAN :${d.fokus.pc[0]}/${d.fokus.pc[1]}/${(d.fokus.pc[1]/d.fokus.pc[0]*100).toFixed(0)}%/${d.fokus.pc[2]}
-======================
-*MEMBER*
-1. Actual NEW MEMBER :${d.newMember}
-2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${d.memberReceipt}/${d.totalReceipt}/${d.memberPct}%
-======================
-*PSM*(In Qty).
-( Target - actual - %)
-${d.psm.map(p=>`${p[0]} : ${p[1]}/${p[2]}/${p[1]>0?(p[2]/p[1]*100).toFixed(0):0}%`).join('\n')}
-======================
-*CATEGORY* (Rupiah)
-1. TOYS (NS) : ${formatRp(d.toys)}
-2. HBPL (NS) : ${formatRp(d.hbpl)}
-======================
-*E-COMMERCE*
-1. FEE BASE (RP) : ${formatRp(d.feeBase)}
-
-Terimakasih`;
-  document.getElementById('waOutput').value = wa;
-  document.getElementById('waOutput').classList.remove('hidden');
-  navigator.clipboard.writeText(wa);
-  alert("Format WA sudah di copy!");
-}
-
-function callAPI(action, params, cb){ params.action = action; params.token = API_TOKEN; const callback = 'cb_'+Date.now(); window[callback] = cb; params.callback = callback; const s = document.createElement('script'); s.src = API_URL+'?'+new URLSearchParams(params).toString(); document.head.appendChild(s); }
-</script>
-</body>
-</html>
+function generateWA
