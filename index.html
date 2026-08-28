@@ -3,110 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2563eb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Report Sales Harian CC21</title>
+<title>TES LOGIN CC21</title>
 <style>
-body{font-family:Arial;background:#f4f4f4;margin:0;padding:12px}
-.login-box,.app-box{max-width:850px;margin:10px auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-h2{text-align:center;margin:0 0 10px;font-size:18px}
-h3{margin-top:16px;border-bottom:2px solid #2563eb;padding-bottom:4px;font-size:15px}
-label{display:block;margin-top:8px;font-weight:bold;font-size:13px}
-input,select,button,textarea{width:100%;padding:12px;margin-top:4px;border:1px solid #ccc;border-radius:10px;font-size:16px}
-button{background:#2563eb;color:#fff;border:none;margin-top:12px;cursor:pointer;font-weight:bold}
-button:hover{background:#1d4ed8}
-button.green{background:#16a34a}
-button.whatsapp{background:#25D366}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.status{margin-top:12px;text-align:center;font-size:14px;font-weight:bold}
+body{font-family:Arial;background:#f4f4f4;padding:20px}
+.box{max-width:400px;margin:50px auto;background:#fff;padding:20px;border-radius:12px}
+input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #ccc;font-size:16px}
+button{background:#2563eb;color:#fff;border:none;font-weight:bold}
 .hidden{display:none}
-.section{background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px}
-.small-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;align-items:center;font-size:12px}
-.small-grid input{padding:6px;font-size:13px}
-.preview-box{background:#dcf8c6;padding:12px;border-radius:10px;margin-top:10px;border:1px solid #25D366;white-space:pre-wrap;font-family:monospace;font-size:12px;max-height:400px;overflow-y:auto}
-@media (max-width: 600px){.grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
-<div id="loginScreen" class="login-box">
-  <h2>Login Sales</h2>
-  <label>Kode Toko</label>
-  <input id="storeCodeLogin" type="text" placeholder="Contoh: CC21" style="text-transform:uppercase" />
-  <label>Nama Sales</label>
-  <input id="namaSalesLogin" type="text" placeholder="Nama kamu" />
-  <button id="loginBtn">MASUK</button>
-  <p id="loginError" style="color:red;text-align:center"></p>
+<div id="login" class="box">
+  <h2>TES LOGIN</h2>
+  <input id="kode" placeholder="KODE TOKO: CC21" style="text-transform:uppercase">
+  <input id="nama" placeholder="NAMA SALES">
+  <button onclick="masuk()">MASUK</button>
+  <p id="err" style="color:red"></p>
 </div>
 
-<div id="app" class="app-box hidden">
-  <h2>REPORT SALES HARIAN</h2>
-  <p id="who" style="text-align:center;color:#2563eb;font-weight:bold;font-size:13px"></p>
-  
-  <div class="grid"><div><label>PERIODE</label><input id="period" type="date"></div><div><label>SHIFT</label><select id="shift"><option>1</option><option>2</option><option>3</option></select></div></div>
-  <div class="grid"><div><label>WH</label><input id="wh" type="text" value="Bekasi"></div><div><label>AM</label><input id="am" type="text" value="Syahrul"></div></div>
-  <div class="grid"><div><label>AC</label><input id="ac" type="text" value="Triyanto"></div><div><label>KD Toko</label><input id="storeCode" type="text" readonly></div></div>
-  <label>Nama Toko</label><input id="storeName" type="text" readonly>
-
-  <h3>*REVENUE*</h3>
-  <div class="grid"><div><label>TIME FACTOR %</label><input id="timeFactor" type="number" step="0.01" value="87.10"></div><div><label>TARGET MTD Rp</label><input id="targetMTD" type="number" value="345059891"></div></div>
-  <div class="grid"><div><label>ACTUAL Rp</label><input id="actual" type="number" value="4646000"></div><div><label>FEE BASE Rp</label><input id="feeBase" type="number" value="25000"></div></div>
-
-  <h3>*FOKUS CABANG*</h3>
-  <div class="section">
-    <div class="small-grid"><b>Nama</b><b>Target</b><b>Sales</b><b>OH</b></div>
-    <div class="small-grid"><span>TEBUS MURAH</span><input id="tm_target" type="number" value="20"><input id="tm_sales" type="number" value="21"><input id="tm_oh" type="number" value="0"></div>
-    <div class="small-grid"><span>SERBA GRATIS</span><input id="sg_target" type="number" value="17"><input id="sg_sales" type="number" value="8"><input id="sg_oh" type="number" value="0"></div>
-    <div class="small-grid"><span>SEUUGER</span><input id="seu_target" type="number" value="40"><input id="seu_sales" type="number" value="4"><input id="seu_oh" type="number" value="0"></div>
-    <div class="small-grid"><span>PROMO CEBAN</span><input id="pc_target" type="number" value="69"><input id="pc_sales" type="number" value="1"><input id="pc_oh" type="number" value="0"></div>
-  </div>
-
-  <h3>*MEMBER*</h3>
-  <div class="grid"><div><label>NEW MEMBER</label><input id="newMember" type="number" value="0"></div><div><label>Struk MEMBER</label><input id="memberReceipt" type="number" value="47"></div></div>
-  <label>Total STRUK</label><input id="totalReceipt" type="number" value="69">
-
-  <h3>*PSM (In Qty)*</h3>
-  <div class="section">
-    <div class="small-grid"><b>Produk</b><b>Target</b><b>Actual</b><b>%</b></div>
-    <div class="small-grid"><input id="psm1n" value="Le mineral"><input id="psm1t" type="number" value="210"><input id="psm1a" type="number" value="8"><input id="psm1p" readonly></div>
-    <div class="small-grid"><input id="psm2n" value="Nescafe"><input id="psm2t" type="number" value="75"><input id="psm2a" type="number" value="6"><input id="psm2p" readonly></div>
-    <div class="small-grid"><input id="psm3n" value="Happy tos"><input id="psm3t" type="number" value="33"><input id="psm3a" type="number" value="1"><input id="psm3p" readonly></div>
-    <div class="small-grid"><input id="psm4n" value="Sedaap"><input id="psm4t" type="number" value="66"><input id="psm4a" type="number" value="10"><input id="psm4p" readonly></div>
-    <div class="small-grid"><input id="psm5n" value="Roma"><input id="psm5t" type="number" value="45"><input id="psm5a" type="number" value="3"><input id="psm5p" readonly></div>
-    <div class="small-grid"><input id="psm6n" value="Rinso"><input id="psm6t" type="number" value="17"><input id="psm6a" type="number" value="18"><input id="psm6p" readonly></div>
-    <div class="small-grid"><input id="psm7n" value="Kahf"><input id="psm7t" type="number" value="24"><input id="psm7a" type="number" value="0"><input id="psm7p" readonly></div>
-    <div class="small-grid"><input id="psm8n" value="H&S"><input id="psm8t" type="number" value="12"><input id="psm8a" type="number" value="0"><input id="psm8p" readonly></div>
-    <div class="small-grid"><input id="psm9n" value="Colagena"><input id="psm9t" type="number" value="55"><input id="psm9a" type="number" value="0"><input id="psm9p" readonly></div>
-  </div>
-
-  <h3>*CATEGORY*</h3>
-  <div class="grid"><div><label>TOYS (NS)</label><input id="toys" type="number" value="0"></div><div><label>HBPL (NS)</label><input id="hbpl" type="number" value="0"></div></div>
-
-  <button id="saveBtn">💾 Simpan Data</button>
-  <button id="previewBtn" class="green">👀 Preview WhatsApp</button>
-  <button id="waBtn" class="whatsapp">📲 Kirim ke WhatsApp</button>
-  
-  <div id="status" class="status"></div>
-  <div id="previewWrap" class="hidden">
-    <h3>Preview Pesan WA</h3>
-    <div id="waPreview" class="preview-box"></div>
-  </div>
+<div id="app" class="box hidden">
+  <h2>BERHASIL LOGIN!</h2>
+  <p id="who"></p>
+  <p>Kalau ini muncul berarti login aman. Tinggal kita tambahin form nya lagi</p>
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbzD9XY0E8C9CDm1z19-EmwZdT_Zyd4WHILlQpkuYb8dCcGi1D9UpbMK3pBD1YNhFUzj/exec';
-const API_TOKEN = 'bc318b0a8cb4498dba48b232e8f6a461';
-const STORE_LIST = {"C624":"TOKO C624","C560":"TOKO C560","CH81":"TOKO CH81","CG76":"TOKO CG76","C573":"TOKO C573","CE47":"TOKO CE47","CA71":"TOKO CA71","CI30":"TOKO CI30","CH41":"TOKO CH41","CG54":"TOKO CG54","C935":"TOKO C935","C965":"TOKO C965","CG86":"TOKO CG86","CA94":"TOKO CA94","C574":"TOKO C574","CI15":"TOKO CI15","CI54":"TOKO CI54","CF50":"TOKO CF50","CC21":"TOKO CC21 KUTN","CI84":"TOKO CI84"};
-let state = { user: null, lastData: null };
+const TOKO = {"CC21":"TOKO CC21 KUTN","C624":"TOKO C624"};
 
-document.getElementById('loginBtn').onclick = login;
-document.getElementById('saveBtn').onclick = saveReport;
-document.getElementById('previewBtn').onclick = previewWA;
-document.getElementById('waBtn').onclick = kirimWA;
-for(let i=1;i<=9;i++){ if(document.getElementById(`psm${i}t`)){document.getElementById(`psm${i}t`).oninput = calcPSM; document.getElementById(`psm${i}a`).oninput = calcPSM;} }
+function masuk(){
+  const k = document.getElementById('kode').value.trim().toUpperCase();
+  const n = document.getElementById('nama').value.trim();
+  document.getElementById('err').innerText = '';
 
-function login(){ 
-  document.getElementById('loginError').innerText = '';
-  const code = document.getElementById('storeCodeLogin').value.trim().toUpperCase(); 
-  const nama = document.getElementById('namaSalesLogin').value.trim(); 
-  if(!code ||!nama){ document
+  if(!k ||!n){ document.getElementById('err').innerText = 'Isi semua'; return; }
+  if(!TOKO[k]){ document.getElementById('err').innerText = 'Kode tidak ada: ' + k; return; }
+
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('who').innerText = TOKO[k] + ' - ' + n;
+}
+</script>
+</body>
+</html>
