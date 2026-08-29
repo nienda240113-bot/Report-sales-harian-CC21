@@ -15,7 +15,6 @@
         .flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .flex > div { flex: 1; min-width: 100px; }
         
-        /* Style Baris Item Dinamis */
         .item-row { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 8px; flex-wrap: wrap; background: #fafafa; padding: 8px; border-radius: 6px; border: 1px solid #eee; }
         .item-row > div { flex: 1; min-width: 70px; }
         .item-row > div.name-field { flex: 2; min-width: 140px; }
@@ -36,7 +35,7 @@
     <div class="section">
         <h3>1. Data Toko</h3>
         <div class="flex">
-            <div><label>Periode</label><input type="text" id="periode" value="29 Agustus"></div>
+            <div><label>Periode (Otomatis)</label><input type="text" id="periode"></div>
             <div><label>WH</label><input type="text" id="wh" value="Bekasi"></div>
             <div><label>AM</label><input type="text" id="am" value="Syahrul"></div>
         </div>
@@ -60,7 +59,7 @@
     <div class="section">
         <h3>3. Fokus Cabang (Bisa Diedit/Ditambah)</h3>
         <div id="fc_container"></div>
-        <button class="add" onclick="addFC('', 0, 0, 0)">+ Tambah Item Fokus Cabang</button>
+        <button class="add" onclick="addFC('', 0, 0)">+ Tambah Item Fokus Cabang</button>
     </div>
 
     <div class="section">
@@ -97,12 +96,17 @@
 </div>
 
 <script>
+    // Set Tanggal Otomatis Hari Ini
+    const today = new Date();
+    const options = { day: 'numeric', month: 'long' };
+    document.getElementById('periode').value = today.toLocaleDateString('id-ID', options);
+
     // Data Default Fokus Cabang
     const initialFC = [
-        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, actual: 0, onhand: 0},
-        {name: "SERBA GRATIS (PAKET)", target: 17, actual: 0, onhand: 0},
-        {name: "SEUUGER", target: 40, actual: 0, onhand: 0},
-        {name: "PROMO CEBAN", target: 69, actual: 0, onhand: 0}
+        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, actual: 0},
+        {name: "SERBA GRATIS (PAKET)", target: 17, actual: 0},
+        {name: "SEUUGER", target: 40, actual: 0},
+        {name: "PROMO CEBAN", target: 69, actual: 0}
     ];
 
     // Data Default PSM
@@ -118,15 +122,14 @@
         {name: "Colagena", target: 55, actual: 0}
     ];
 
-    // Fungsi Tambah Row Fokus Cabang
-    function addFC(name, target, actual, onhand) {
+    // Fungsi Tambah Row Fokus Cabang (Tanpa On Hand)
+    function addFC(name, target, actual) {
         const div = document.createElement('div');
         div.className = 'item-row fc-row';
         div.innerHTML = `
             <div class="name-field"><label>Nama Item</label><input type="text" class="fc_name" value="${name}"></div>
             <div><label>Target</label><input type="number" class="fc_target" value="${target}"></div>
             <div><label>Sales</label><input type="number" class="fc_actual" value="${actual}"></div>
-            <div><label>On Hand</label><input type="number" class="fc_onhand" value="${onhand}"></div>
             <div class="btn-field"><button class="del" onclick="this.parentElement.parentElement.remove()">✕</button></div>
         `;
         document.getElementById('fc_container').appendChild(div);
@@ -146,7 +149,7 @@
     }
 
     // Render data awal
-    initialFC.forEach(f => addFC(f.name, f.target, f.actual, f.onhand));
+    initialFC.forEach(f => addFC(f.name, f.target, f.actual));
     initialPSM.forEach(p => addPSM(p.name, p.target, p.actual));
 
     function formatRp(angka) {
@@ -190,15 +193,14 @@
         report += `- GAP To Time Factor:${formatRp(gap_tf)}\n\n`;
 
         report += `*FOKUS CABANG*\n======================\n`;
-        report += `TARGET/SALES/ACV%/ON HAND\n`;
+        report += `TARGET/SALES/ACV%\n`;
         let fcRows = document.querySelectorAll('.fc-row');
         fcRows.forEach((row, idx) => {
             let n = row.querySelector('.fc_name').value;
             let t = parseInt(row.querySelector('.fc_target').value) || 0;
             let a = parseInt(row.querySelector('.fc_actual').value) || 0;
-            let oh = parseInt(row.querySelector('.fc_onhand').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${idx + 1}. ${n} :${t}/${a}/${p}%/${oh}\n`;
+            if(n.trim() !== '') report += `${idx + 1}. ${n} :${t}/${a}/${p}%\n`;
         });
         report += `======================\n`;
 
