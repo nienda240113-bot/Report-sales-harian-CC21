@@ -1,50 +1,33 @@
-<!-- TOMBOL SIMPAN SCREENSHOT -->
+<!-- TOMBOL COPY REPORT -->
 <style>
-  #btnSimpanCC21 {
+  #btnCopyReport {
     position: fixed;
     bottom: 20px;
     right: 20px;
     padding: 14px 18px;
-    background: linear-gradient(135deg, #16a34a, #15803d);
+    background: #2563eb;
     color: white;
     border: none;
     border-radius: 50px;
     font-weight: 700;
     font-size: 14px;
-    box-shadow: 0 4px 12px rgba(22,163,74,0.4);
-    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 999999;
     cursor: pointer;
   }
-  #btnSimpanCC21:active { transform: scale(0.95); }
-  @media (max-width: 768px) { #btnSimpanCC21 { bottom: 80px; } }
+  @media (max-width: 768px) { #btnCopyReport { bottom: 80px; } }
 </style>
 
-<button id="btnSimpanCC21">📸 Simpan Gambar</button>
+<button id="btnCopyReport" onclick="copyReport()">📋 Salin Report</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-document.getElementById('btnSimpanCC21').addEventListener('click', function() {
-  const btn = this;
-  btn.innerText = "⏳ Menyimpan...";
-  
-  // Tunggu 500ms biar loading selesai
-  setTimeout(() => {
-    html2canvas(document.body, {
-      scale: 2, // biar HD
-      useCORS: true,
-      scrollY: -window.scrollY
-    }).then(canvas => {
-      let link = document.createElement('a');
-      let tanggal = new Date().toISOString().slice(0,10);
-      link.download = 'Report-CC21-' + tanggal + '.png';
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      btn.innerText = "✅ Tersimpan";
-      setTimeout(() => btn.innerText = "📸 Simpan Gambar", 2000);
-    }).catch(err => {
-      alert("Gagal menyimpan: " + err);
-      btn.innerText = "📸 Simpan Gambar";
-    });
-  }, 500);
-});
+function copyReport() {
+  // Ambil semua teks yang ada di halaman
+  let teks = document.body.innerText;
+  navigator.clipboard.writeText(teks).then(function() {
+    alert("✅ Report berhasil disalin! Tinggal paste ke WA");
+  }, function() {
+    alert("Gagal menyalin. Coba blok manual ya");
+  });
+}
 </script>
