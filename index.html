@@ -6,94 +6,158 @@
 <title>Report Sales Harian CC21</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    * { box-sizing: border-box; }
-  body { font-family: 'Inter', sans-serif; background:#f3f4f6; margin:0; color:#111827; }
-  .header { background:linear-gradient(90deg, #2563eb, #1e40af); color:white; padding:16px; position:sticky; top:0; }
-  .header h2 { margin:0; font-size:18px; }
-  .container { padding:16px; max-width:1000px; margin:auto; }
-  .summary { display:grid; grid-template-columns: repeat(2,1fr); gap:12px; margin-bottom:16px; }
-  .card { background:white; padding:14px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
-  .card .label { font-size:12px; color:#6b7280; }
-  .card .value { font-size:20px; font-weight:700; margin-top:4px; }
-  .table-wrapper { background:white; border-radius:12px; padding:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08); overflow-x:auto; }
-  table { width:100%; border-collapse: collapse; min-width:450px; }
-  thead { background:#f9fafb; }
-  th, td { padding:12px 10px; text-align:left; font-size:14px; }
-  td.text-right, th.text-right { text-align:right; }
-  tbody tr { border-top:1px solid #f3f4f6; }
-  tbody tr:hover { background:#f9fafb; }
-  @media(min-width:768px){ .summary{ grid-template-columns: repeat(3,1fr); } }
+  body { font-family: 'Inter', sans-serif; background:#f3f4f6; margin:0; color:#1f2937; }
+.header { background:linear-gradient(90deg, #2563eb, #1e40af); color:white; padding:16px; }
+.header h1 { margin:0; font-size:18px; }
+.header input { background:rgba(255,255,255,0.2); border:none; color:white; padding:6px; border-radius:6px; margin:4px 4px 0 0; }
+.container { padding:16px; max-width:900px; margin:auto; }
+.card { background:white; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
+.card-title { font-size:15px; font-weight:700; color:#2563eb; margin-bottom:10px; }
+  table { width:100%; border-collapse: collapse; font-size:13px; }
+  th { background:#f9fafb; padding:10px; text-align:left; font-weight:600; }
+  td { padding:8px 10px; border-top:1px solid #f3f4f6; }
+  input[type=number] { width:90px; padding:6px; border:1px solid #d1d5db; border-radius:6px; text-align:right; }
+.btn { background:#2563eb; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; }
+.btn:hover { background:#1e40af; }
+.negatif { color:#dc2626; font-weight:700; }
+.positif { color:#16a34a; font-weight:700; }
+.total-row { background:#eff6ff; font-weight:700; }
+ @media(max-width:768px){ table{display:block; overflow-x:auto;} input[type=number]{width:70px;} }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>Report Sales Harian CC21</h2>
+  <h1>REPORT SALES HARIAN CC21</h1>
+  <input type="date" id="periode">
+  <input type="text" id="wh" placeholder="WH" value="Bekasi">
+  <input type="text" id="am" placeholder="AM" value="SRD">
+  <input type="text" id="ac" placeholder="AC" value="Triyanto">
+  <input type="text" id="kd" placeholder="KD Toko" value="CC21">
+  <input type="text" id="toko" placeholder="Nama Toko" value="KUTN">
+  <input type="number" id="shift" placeholder="Shift" value="2">
 </div>
 
 <div class="container">
-  <div class="summary">
-    <div class="card">
-      <div class="label">Total Penjualan</div>
-      <div class="value" id="totalPenjualan">Rp 0</div> <!-- ID PENTING -->
-    </div>
-    <div class="card">
-      <div class="label">Transaksi</div>
-      <div class="value" id="totalTransaksi">0</div> <!-- ID PENTING -->
-    </div>
-    <div class="card">
-      <div class="label">Rata-rata</div>
-      <div class="value" id="rataRata">Rp 0</div> <!-- ID PENTING -->
-    </div>
+
+  <div class="card">
+    <div class="card-title">*REVENUE*</div>
+    <table id="revenueTable">
+      <thead><tr><th>Keterangan</th><th>Target</th><th>Actual</th><th>Ach%</th><th>Gap</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>NET SALES</td>
+          <td><input type="number" id="targetMTD" value="345059891"></td>
+          <td><input type="number" id="actual" value="12911701"></td>
+          <td id="achMTD">0%</td>
+          <td id="gapMTD">0</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td>Time Factor</td><td colspan="4"><input type="number" id="timeFactor" value="87.1" step="0.1"> %</td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Produk</th>
-          <th class="text-right">Qty</th>
-          <th class="text-right">Harga</th>
-          <th class="text-right">Total</th>
-        </tr>
-      </thead>
-      <tbody id="tabelData"> <!-- ID PENTING: JS lama pasti narget ini -->
-        <!-- Data dari JS akan masuk ke sini -->
+  <div class="card">
+    <div class="card-title">*FOKUS CABANG*</div>
+    <table id="fokusTable">
+      <thead><tr><th>Program</th><th>Target Qty</th><th>Actual Qty</th><th>Ach%</th></tr></thead>
+      <tbody>
+        <tr><td>TEBUS MURAH</td><td><input type="number" value="20"></td><td><input type="number" value="29"></td><td>0%</td></tr>
+        <tr><td>SERBA GRATIS</td><td><input type="number" value="17"></td><td><input type="number" value="19"></td><td>0%</td></tr>
+        <tr><td>SEUUGER</td><td><input type="number" value="98"></td><td><input type="number" value="19"></td><td>0%</td></tr>
+        <tr><td>PROMO CEBAN</td><td><input type="number" value="210"></td><td><input type="number" value="1"></td><td>0%</td></tr>
       </tbody>
     </table>
   </div>
+
+  <div class="card">
+    <div class="card-title">*PSM (In Qty)*</div>
+    <table id="psmTable">
+      <thead><tr><th>Item</th><th>Target</th><th>Actual</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>Le mineral</td><td><input type="number" value="210"></td><td><input type="number" value="16"></td><td>0%</td></tr>
+        <tr><td>Nescafe</td><td><input type="number" value="75"></td><td><input type="number" value="2"></td><td>0%</td></tr>
+        <tr><td>Happy tos</td><td><input type="number" value="33"></td><td><input type="number" value="7"></td><td>0%</td></tr>
+        <tr><td>Sedaap</td><td><input type="number" value="66"></td><td><input type="number" value="0"></td><td>0%</td></tr>
+        <tr><td>Roma</td><td><input type="number" value="45"></td><td><input type="number" value="0"></td><td>0%</td></tr>
+        <tr><td>Rinso</td><td><input type="number" value="17"></td><td><input type="number" value="2"></td><td>0%</td></tr>
+        <tr><td>Kahf</td><td><input type="number" value="24"></td><td><input type="number" value="3"></td><td>0%</td></tr>
+        <tr><td>H&S</td><td><input type="number" value="12"></td><td><input type="number" value="1"></td><td>0%</td></tr>
+        <tr><td>Colagena</td><td><input type="number" value="55"></td><td><input type="number" value="0"></td><td>0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="btn" onclick="hitungOtomatis()">Hitung Otomatis</button>
+  <button class="btn" style="background:#16a34a" onclick="exportWA()">Copy ke WA</button>
+
 </div>
 
 <script>
-// CONTOH JS LAMA KAMU. Tinggal tempel di bawah
-// Asumsi data dari API/Google Sheet
-const data = [
-  {produk: "Kopi Latte", qty: 35, harga: 22000},
-  {produk: "Kopi Hitam", qty: 28, harga: 15000},
-]
+function formatRupiah(angka){
+  return "Rp " + Number(angka).toLocaleString('id-ID');
+}
 
-let totalJual = 0;
-let totalTrx = 0;
-let html = "";
+function hitungOtomatis(){
+  // REVENUE
+  let target = parseFloat(document.getElementById('targetMTD').value) || 0;
+  let actual = parseFloat(document.getElementById('actual').value) || 0;
+  let timeFactor = parseFloat(document.getElementById('timeFactor').value) || 0;
 
-data.forEach(item => {
-  let total = item.qty * item.harga;
-  totalJual += total;
-  totalTrx += item.qty;
-  html += `
-    <tr>
-      <td>${item.produk}</td>
-      <td class="text-right">${item.qty}</td>
-      <td class="text-right">Rp${item.harga.toLocaleString('id-ID')}</td>
-      <td class="text-right">Rp${total.toLocaleString('id-ID')}</td>
-    </tr>
-  `
-})
+  let achMTD = target > 0? (actual / target * 100) : 0;
+  let targetTF = target * (timeFactor/100);
+  let achTF = targetTF > 0? (actual / targetTF * 100) : 0;
+  let gapMTD = target - actual;
+  let gapTF = targetTF - actual;
 
-document.getElementById("tabelData").innerHTML = html;
-document.getElementById("totalPenjualan").innerText = "Rp " + totalJual.toLocaleString('id-ID');
-document.getElementById("totalTransaksi").innerText = totalTrx;
-document.getElementById("rataRata").innerText = "Rp " + Math.round(totalJual/totalTrx).toLocaleString('id-ID');
+  document.getElementById('achMTD').innerText = achMTD.toFixed(2) + "%";
+  document.getElementById('gapMTD').innerText = formatRupiah(gapMTD);
+
+  // FOKUS CABANG
+  document.querySelectorAll('#fokusTable tbody tr').forEach(row => {
+    let t = parseFloat(row.cells[1].querySelector('input').value) || 0;
+    let a = parseFloat(row.cells[2].querySelector('input').value) || 0;
+    let ach = t > 0? (a / t * 100) : 0;
+    row.cells[3].innerText = ach.toFixed(2) + "%";
+    row.cells[3].className = ach >= 100? 'positif' : 'negatif';
+  });
+
+  // PSM
+  document.querySelectorAll('#psmTable tbody tr').forEach(row => {
+    let t = parseFloat(row.cells[1].querySelector('input').value) || 0;
+    let a = parseFloat(row.cells[2].querySelector('input').value) || 0;
+    let ach = t > 0? (a / t * 100) : 0;
+    row.cells[3].innerText = ach.toFixed(2) + "%";
+  });
+}
+
+function exportWA(){
+  hitungOtomatis();
+  let txt = `REPORT SALES HARIAN
+PERIODE : ${document.getElementById('periode').value}
+WH : ${document.getElementById('wh').value}
+AM : ${document.getElementById('am').value}
+AC : ${document.getElementById('ac').value}
+KD Toko : ${document.getElementById('kd').value}
+Nama Toko : ${document.getElementById('toko').value}
+Shift : ${document.getElementById('shift').value}
+
+*REVENUE*
+ACTUAL :${formatRupiah(document.getElementById('actual').value)}
+ACHIVE MTD :${document.getElementById('achMTD').innerText}
+GAP TO TARGET :${document.getElementById('gapMTD').innerText}
+
+Terimakasih`;
+  navigator.clipboard.writeText(txt);
+  alert("Sudah dicopy! Tinggal paste ke WA");
+}
+
+// hitung pertama kali pas load
+hitungOtomatis();
 </script>
 
 </body>
