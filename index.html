@@ -122,7 +122,7 @@
         {name: "Colagena", target: 55, actual: 0}
     ];
 
-    // Fungsi Tambah Row Fokus Cabang (Tanpa On Hand)
+    // Fungsi Tambah Row Fokus Cabang
     function addFC(name, target, actual) {
         const div = document.createElement('div');
         div.className = 'item-row fc-row';
@@ -193,30 +193,30 @@
         report += `- GAP To Time Factor:${formatRp(gap_tf)}\n\n`;
 
         report += `*FOKUS CABANG*\n======================\n`;
-        report += `TARGET/SALES/ACV%\n`;
+        report += `TARGET , SALES , ACV%\n`;
         let fcRows = document.querySelectorAll('.fc-row');
         fcRows.forEach((row, idx) => {
             let n = row.querySelector('.fc_name').value;
             let t = parseInt(row.querySelector('.fc_target').value) || 0;
             let a = parseInt(row.querySelector('.fc_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${idx + 1}. ${n} :${t}/${a}/${p}%\n`;
+            if(n.trim() !== '') report += `${idx + 1}. ${n} : ${t} , ${a} , ${p}%\n`;
         });
         report += `======================\n`;
 
         report += `*MEMBER*\n`;
         report += `1. Actual NEW MEMBER :${document.getElementById('new_member').value}\n`;
-        report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk =${str_member}/${tot_struk}/${pct_member}%\n`;
+        report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk = ${str_member} , ${tot_struk} , ${pct_member}%\n`;
         report += `======================\n`;
 
-        report += `*PSM*(In Qty).\n( Target - actual - %)\n`;
+        report += `*PSM*(In Qty).\n( Target , actual , %)\n`;
         let psmRows = document.querySelectorAll('.psm-row');
         psmRows.forEach(row => {
             let n = row.querySelector('.psm_name').value;
             let t = parseInt(row.querySelector('.psm_target').value) || 0;
             let a = parseInt(row.querySelector('.psm_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${n} : ${t}/${a}/${p}%\n`;
+            if(n.trim() !== '') report += `${n} : ${t} , ${a} , ${p}%\n`;
         });
         report += `======================\n`;
 
