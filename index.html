@@ -13,8 +13,9 @@
         label { display: block; font-weight: bold; margin-top: 8px; font-size: 12px; color: #555; }
         input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         
-        /* Kolom yang tidak bisa diedit (Otomatis) */
+        /* Kolom yang tidak bisa diedit */
         input[readonly] { background-color: #e9ecef; color: #333; cursor: not-allowed; font-weight: bold; text-align: center; }
+        .readonly-tf { background-color: #e2f0d9 !important; color: #28a745 !important; }
 
         .flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .flex > div { flex: 1; min-width: 100px; }
@@ -40,7 +41,7 @@
     <div class="section">
         <h3>1. Data Toko</h3>
         <div class="flex">
-            <div><label>Periode (Otomatis)</label><input type="text" id="periode"></div>
+            <div><label>Periode (Otomatis)</label><input type="text" id="periode" readonly></div>
             <div><label>WH</label><input type="text" id="wh" value="Bekasi"></div>
             <div><label>AM</label><input type="text" id="am" value="Syahrul"></div>
         </div>
@@ -55,7 +56,7 @@
     <div class="section">
         <h3>2. Revenue</h3>
         <div class="flex">
-            <div><label>Time Factor (%)</label><input type="number" id="tf_pct" value="87.1" step="0.1"></div>
+            <div><label>Time Factor (%) (Otomatis)</label><input type="number" id="tf_pct" class="readonly-tf" step="0.1"></div>
             <div><label>Target MTD (Rp)</label><input type="number" id="target_mtd" value="345059891"></div>
             <div><label>Actual (Rp)</label><input type="number" id="actual_mtd" value="4646000"></div>
         </div>
@@ -101,14 +102,24 @@
 </div>
 
 <script>
-    // Set Tanggal Otomatis Mengikuti Perangkat (Baku Bahasa Indonesia)
+    // 1. Set Tanggal Otomatis & Time Factor Otomatis
     const today = new Date();
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    
     const tanggal = today.getDate();
-    const bulan = namaBulan[today.getMonth()];
-    document.getElementById('periode').value = `${tanggal} ${bulan}`;
+    const bulan = today.getMonth(); // 0 s.d 11
+    const tahun = today.getFullYear();
+    
+    // Tampilkan di Periode
+    document.getElementById('periode').value = `${tanggal} ${namaBulan[bulan]}`;
 
-    // Fungsi untuk menghitung persentase Real-Time di layar
+    // Hitung total hari di bulan ini (Time Factor)
+    const totalHariBulanIni = new Date(tahun, bulan + 1, 0).getDate();
+    const tf_otomatis = ((tanggal / totalHariBulanIni) * 100).toFixed(1); // 1 angka di belakang koma
+    document.getElementById('tf_pct').value = tf_otomatis;
+
+
+    // 2. Fungsi Kalkulator Persen di Layar
     function hitungPersenLayar(element) {
         let row = element.parentElement.parentElement;
         let target = parseInt(row.querySelector('.inp-target').value) || 0;
@@ -143,7 +154,6 @@
         {name: "Colagena", target: 55, actual: 0}
     ];
 
-    // Fungsi Tambah Row Fokus Cabang (Tampilan Baru)
     function addFC(name, target, actual) {
         let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
         const div = document.createElement('div');
@@ -158,7 +168,6 @@
         document.getElementById('fc_container').appendChild(div);
     }
 
-    // Fungsi Tambah Row PSM (Tampilan Baru)
     function addPSM(name, target, actual) {
         let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
         const div = document.createElement('div');
@@ -173,12 +182,11 @@
         document.getElementById('psm_container').appendChild(div);
     }
 
-    // Render data awal
     initialFC.forEach(f => addFC(f.name, f.target, f.actual));
     initialPSM.forEach(p => addPSM(p.name, p.target, p.actual));
 
     function formatRp(angka) {
-        return "Rp " + Math.round(angka).toLocaleString('id-ID');
+        return "Rp " + Math.round(angka).toLocaleString('id-ID').replace(/,/g, ".");
     }
 
     function generateReport() {
@@ -218,30 +226,33 @@
         report += `- GAP To Time Factor:${formatRp(gap_tf)}\n\n`;
 
         report += `*FOKUS CABANG*\n======================\n`;
-        report += `TARGET , SALES , ACV%\n`;
+        report += `TARGET / SALES / ACV%\n`;
         let fcRows = document.querySelectorAll('.fc-row');
         fcRows.forEach((row, idx) => {
             let n = row.querySelector('.fc_name').value;
             let t = parseInt(row.querySelector('.fc_target').value) || 0;
             let a = parseInt(row.querySelector('.fc_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${idx + 1}. ${n} : ${t} , ${a} , ${p}%\n`;
+            // Mengubah format koma menjadi garis miring (/)
+            if(n.trim() !== '') report += `${idx + 1}. ${n} : ${t} / ${a} / ${p}%\n`;
         });
         report += `======================\n`;
 
         report += `*MEMBER*\n`;
         report += `1. Actual NEW MEMBER :${document.getElementById('new_member').value}\n`;
-        report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk = ${str_member} , ${tot_struk} , ${pct_member}%\n`;
+        // Mengubah format koma menjadi garis miring (/)
+        report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk = ${str_member} / ${tot_struk} / ${pct_member}%\n`;
         report += `======================\n`;
 
-        report += `*PSM*(In Qty).\n( Target , actual , %)\n`;
+        report += `*PSM*(In Qty).\n( Target / actual / %)\n`;
         let psmRows = document.querySelectorAll('.psm-row');
         psmRows.forEach(row => {
             let n = row.querySelector('.psm_name').value;
             let t = parseInt(row.querySelector('.psm_target').value) || 0;
             let a = parseInt(row.querySelector('.psm_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${n} : ${t} , ${a} , ${p}%\n`;
+            // Mengubah format koma menjadi garis miring (/)
+            if(n.trim() !== '') report += `${n} : ${t} / ${a} / ${p}%\n`;
         });
         report += `======================\n`;
 
@@ -266,4 +277,4 @@
 </script>
 
 </body>
-    </html>
+</html>
