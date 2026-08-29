@@ -12,12 +12,17 @@
         .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         label { display: block; font-weight: bold; margin-top: 8px; font-size: 12px; color: #555; }
         input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        
+        /* Kolom yang tidak bisa diedit (Otomatis) */
+        input[readonly] { background-color: #e9ecef; color: #333; cursor: not-allowed; font-weight: bold; text-align: center; }
+
         .flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .flex > div { flex: 1; min-width: 100px; }
         
-        .item-row { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 8px; flex-wrap: wrap; background: #fafafa; padding: 8px; border-radius: 6px; border: 1px solid #eee; }
-        .item-row > div { flex: 1; min-width: 70px; }
-        .item-row > div.name-field { flex: 2; min-width: 140px; }
+        /* Layout Item Row (Fokus Cabang & PSM) */
+        .item-row { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 8px; flex-wrap: nowrap; background: #fafafa; padding: 8px; border-radius: 6px; border: 1px solid #eee; overflow-x: auto;}
+        .item-row > div { flex: 1; min-width: 60px; }
+        .item-row > div.name-field { flex: 2; min-width: 120px; }
         .item-row > div.btn-field { flex: 0 0 35px; min-width: 35px; }
 
         button { background-color: #28a745; color: white; border: none; padding: 12px 15px; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 14px; font-weight: bold; }
@@ -57,7 +62,7 @@
     </div>
 
     <div class="section">
-        <h3>3. Fokus Cabang (Bisa Diedit/Ditambah)</h3>
+        <h3>3. Fokus Cabang</h3>
         <div id="fc_container"></div>
         <button class="add" onclick="addFC('', 0, 0)">+ Tambah Item Fokus Cabang</button>
     </div>
@@ -72,7 +77,7 @@
     </div>
 
     <div class="section">
-        <h3>5. PSM (Bisa Diedit/Ditambah)</h3>
+        <h3>5. PSM</h3>
         <div id="psm_container"></div>
         <button class="add" onclick="addPSM('', 0, 0)">+ Tambah Item PSM</button>
     </div>
@@ -96,10 +101,26 @@
 </div>
 
 <script>
-    // Set Tanggal Otomatis Hari Ini
+    // Set Tanggal Otomatis Mengikuti Perangkat (Baku Bahasa Indonesia)
     const today = new Date();
-    const options = { day: 'numeric', month: 'long' };
-    document.getElementById('periode').value = today.toLocaleDateString('id-ID', options);
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const tanggal = today.getDate();
+    const bulan = namaBulan[today.getMonth()];
+    document.getElementById('periode').value = `${tanggal} ${bulan}`;
+
+    // Fungsi untuk menghitung persentase Real-Time di layar
+    function hitungPersenLayar(element) {
+        let row = element.parentElement.parentElement;
+        let target = parseInt(row.querySelector('.inp-target').value) || 0;
+        let actual = parseInt(row.querySelector('.inp-actual').value) || 0;
+        let outputPct = row.querySelector('.out-pct');
+        
+        if(target === 0) {
+            outputPct.value = "0%";
+        } else {
+            outputPct.value = Math.round((actual / target) * 100) + "%";
+        }
+    }
 
     // Data Default Fokus Cabang
     const initialFC = [
@@ -122,28 +143,32 @@
         {name: "Colagena", target: 55, actual: 0}
     ];
 
-    // Fungsi Tambah Row Fokus Cabang
+    // Fungsi Tambah Row Fokus Cabang (Tampilan Baru)
     function addFC(name, target, actual) {
+        let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
         const div = document.createElement('div');
         div.className = 'item-row fc-row';
         div.innerHTML = `
             <div class="name-field"><label>Nama Item</label><input type="text" class="fc_name" value="${name}"></div>
-            <div><label>Target</label><input type="number" class="fc_target" value="${target}"></div>
-            <div><label>Sales</label><input type="number" class="fc_actual" value="${actual}"></div>
-            <div class="btn-field"><button class="del" onclick="this.parentElement.parentElement.remove()">✕</button></div>
+            <div><label>Target</label><input type="number" class="fc_target inp-target" value="${target}" oninput="hitungPersenLayar(this)"></div>
+            <div><label>Actual</label><input type="number" class="fc_actual inp-actual" value="${actual}" oninput="hitungPersenLayar(this)"></div>
+            <div><label>%</label><input type="text" class="out-pct" value="${pct}%" readonly tabindex="-1"></div>
+            <div class="btn-field"><label>&nbsp;</label><button class="del" onclick="this.parentElement.parentElement.remove()" tabindex="-1">✕</button></div>
         `;
         document.getElementById('fc_container').appendChild(div);
     }
 
-    // Fungsi Tambah Row PSM
+    // Fungsi Tambah Row PSM (Tampilan Baru)
     function addPSM(name, target, actual) {
+        let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
         const div = document.createElement('div');
         div.className = 'item-row psm-row';
         div.innerHTML = `
             <div class="name-field"><label>Nama Item</label><input type="text" class="psm_name" value="${name}"></div>
-            <div><label>Target</label><input type="number" class="psm_target" value="${target}"></div>
-            <div><label>Actual</label><input type="number" class="psm_actual" value="${actual}"></div>
-            <div class="btn-field"><button class="del" onclick="this.parentElement.parentElement.remove()">✕</button></div>
+            <div><label>Target</label><input type="number" class="psm_target inp-target" value="${target}" oninput="hitungPersenLayar(this)"></div>
+            <div><label>Actual</label><input type="number" class="psm_actual inp-actual" value="${actual}" oninput="hitungPersenLayar(this)"></div>
+            <div><label>%</label><input type="text" class="out-pct" value="${pct}%" readonly tabindex="-1"></div>
+            <div class="btn-field"><label>&nbsp;</label><button class="del" onclick="this.parentElement.parentElement.remove()" tabindex="-1">✕</button></div>
         `;
         document.getElementById('psm_container').appendChild(div);
     }
