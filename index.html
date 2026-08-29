@@ -1,165 +1,26 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Sales Harian CC21</title>
 <style>
-  body { font-family: Arial, sans-serif; background:#f1f5f9; padding:10px; }
-  .container { max-width:700px; margin:auto; background:white; padding:16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
-  h2 { text-align:center; color:#2563eb; margin:0 0 10px 0; }
-  h3 { color:#1e40af; border-bottom:2px solid #dbeafe; padding-bottom:4px; margin-top:16px; }
-  label { font-weight:600; font-size:13px; display:block; margin-top:8px; }
-  input { width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; margin-top:4px; box-sizing:border-box; }
-  .row { display:flex; gap:8px; }
-  .row input { flex:1; }
-  #btnCopyHasil { margin-top:16px; width:100%; padding:14px; background:linear-gradient(135deg, #16a34a, #15803d); color:white; border:none; border-radius:10px; font-weight:700; font-size:16px; position:sticky; bottom:10px; }
-  #hasilReport { background:#f8fafc; padding:12px; border-radius:8px; margin-top:10px; font-family:monospace; white-space:pre-wrap; font-size:13px; border:1px dashed #94a3b8; }
-  hr { margin:12px 0; border:none; border-top:1px solid #e2e8f0; }
+  body { font-family: 'Inter', sans-serif; background:#f9fafb; margin:0; }
+ .header { background:#2563eb; color:white; padding:16px; position:sticky; top:0; }
+ .summary { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; padding:16px; }
+ .card { background:white; padding:16px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+  table { width:100%; border-collapse: collapse; background:white; }
+  th { background:#f3f4f6; padding:12px; text-align:left; font-weight:600; }
+  td { padding:12px; border-bottom:1px solid #e5e7eb; }
+  tr:nth-child(even) { background:#fafafa; }
+  @media(max-width:768px){.summary{grid-template-columns:1fr 1fr;} table{display:block; overflow-x:auto;} }
 </style>
-</head>
-<body>
 
-<div class="container">
-  <h2>📊 REPORT SALES HARIAN</h2>
-  
-  <!-- DATA TOKO -->
-  <label>Periode</label><input id="periode" value="29 Agustus">
-  <div class="row">
-    <div><label>WH</label><input id="wh" value="Bekasi"></div>
-    <div><label>Shift</label><input id="shift" value="1"></div>
-  </div>
-  <label>AM</label><input id="am" value="Syahrul">
-  <label>AC</label><input id="ac" value="Triyanto">
-  <div class="row">
-    <div><label>KD Toko</label><input id="kd" value="CC21"></div>
-    <div><label>Nama Toko</label><input id="nama" value="TOKO CC21 KUTN"></div>
-  </div>
-
-  <hr>
-  <!-- REVENUE -->
-  <h3>REVENUE</h3>
-  <label>Time Factor %</label><input id="tf" type="number" value="87.1">
-  <label>TARGET MTD</label><input id="target" type="number" value="345059891">
-  <label>ACTUAL</label><input id="actual" type="number" value="4646000">
-
-  <hr>
-  <!-- FOKUS CABANG -->
-  <h3>FOKUS CABANG</h3>
-  <small>Format: Target/Actual/OnHand</small>
-  <label>TEBUS MURAH (QTY REDEEM)</label><input id="tm" value="20/0/0">
-  <label>SERBA GRATIS (PAKET)</label><input id="sg" value="17/0/0">
-  <label>SEUUGER</label><input id="seu" value="40/0/0">
-  <label>PROMO CEBAN</label><input id="pc" value="69/0/0">
-
-  <hr>
-  <!-- MEMBER -->
-  <h3>MEMBER</h3>
-  <label>Actual NEW MEMBER</label><input id="newm" type="number" value="0">
-  <label>Struk MEMBER</label><input id="strukM" type="number" value="47">
-  <label>Total Struk</label><input id="strukT" type="number" value="69">
-
-  <hr>
-  <!-- PSM -->
-  <h3>PSM (In Qty)</h3>
-  <small>Format: Target/Actual</small>
-  <div class="row"><div><label>Le mineral</label><input id="psm1" value="210/8"></div><div><label>Nescafe</label><input id="psm2" value="75/6"></div></div>
-  <div class="row"><div><label>Happy tos</label><input id="psm3" value="33/1"></div><div><label>Sedaap</label><input id="psm4" value="66/10"></div></div>
-  <div class="row"><div><label>Roma</label><input id="psm5" value="45/3"></div><div><label>Rinso</label><input id="psm6" value="17/18"></div></div>
-  <div class="row"><div><label>Kahf</label><input id="psm7" value="24/0"></div><div><label>H&S</label><input id="psm8" value="12/0"></div></div>
-  <label>Colagena</label><input id="psm9" value="55/0">
-
-  <hr>
-  <!-- CATEGORY -->
-  <h3>CATEGORY (Rupiah)</h3>
-  <label>TOYS (NS)</label><input id="cat1" type="number" value="0">
-  <label>HBPL (NS)</label><input id="cat2" type="number" value="0">
-
-  <hr>
-  <!-- ECOMMERCE -->
-  <h3>E-COMMERCE</h3>
-  <label>FEE BASE (RP)</label><input id="fee" type="number" value="25000">
-
-  <button id="btnCopyHasil" onclick="generateReport()">📋 Salin & Hitung Report</button>
-  <div id="hasilReport"></div>
+<div class="header">
+  <h2>Report Sales Harian CC21</h2>
 </div>
 
-<script>
-function rp(angka){ return "Rp " + Number(angka||0).toLocaleString("id-ID"); }
-function pct(a,b){ if(b==0) return "0%"; return ((a/b)*100).toFixed(2)+"%"; }
-function psmHit(val){ let [t,a]=val.split("/").map(Number); return `${t}/${a}/${pct(a,t)}`; }
+<div class="summary">
+  <div class="card"><b>Total Penjualan</b><br>Rp 12.450.000</div>
+  <div class="card"><b>Transaksi</b><br>87</div>
+  <div class="card"><b>Rata-rata</b><br>Rp 143.103</div>
+</div>
 
-function generateReport(){
-  let tf = parseFloat(document.getElementById('tf').value);
-  let target = parseFloat(document.getElementById('target').value);
-  let actual = parseFloat(document.getElementById('actual').value);
-  
-  let targetTF = target * (tf/100);
-  let achiveMTD = (actual/target)*100;
-  let achiveTF = (actual/targetTF)*100;
-  let gapT = target - actual;
-  let gapTF = targetTF - actual;
-  let memberPct = pct(document.getElementById('strukM').value, document.getElementById('strukT').value);
-
-  let teks = `REPORT SALES HARIAN
-PERIODE : ${document.getElementById('periode').value}
-WH : ${document.getElementById('wh').value}
-AM : ${document.getElementById('am').value}
-AC : ${document.getElementById('ac').value}
-KD Toko : ${document.getElementById('kd').value}
-Nama Toko : ${document.getElementById('nama').value}
-Shift : ${document.getElementById('shift').value}
-
-
-*REVENUE*
-1. NET SALES
-- Time factor: ${tf}%
-- TARGET MTD :${rp(target)}
-- Target Time Factor: ${rp(targetTF)}
-- ACTUAL :${rp(actual)}
-- ACHIVE MTD:${achiveMTD.toFixed(2)}%
-- Achieved Time Factor :${achiveTF.toFixed(2)}%
-- GAP TO TARGET :${rp(gapT)}
-- GAP To Time Factor:${rp(gapTF)}
-
-*FOKUS CABANG*
-
-TARGET/SALES/ACV%/ON HAND
-1. TEBUS MURAH (QTY REDEEM) :${document.getElementById('tm').value}
-2. SERBA GRATIS (PAKET) :${document.getElementById('sg').value}
-3. SEUUGER :${document.getElementById('seu').value}
-4. PROMO CEBAN :${document.getElementById('pc').value}
-
-*MEMBER*
-1. Actual NEW MEMBER :${document.getElementById('newm').value}
-2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${document.getElementById('strukM').value}/${document.getElementById('strukT').value}/${memberPct}
-
-*PSM*(In Qty).
-( Target - actual - %)
-Le mineral : ${psmHit(document.getElementById('psm1').value)}
-Nescafe : ${psmHit(document.getElementById('psm2').value)}
-Happy tos : ${psmHit(document.getElementById('psm3').value)}
-Sedaap : ${psmHit(document.getElementById('psm4').value)}
-Roma : ${psmHit(document.getElementById('psm5').value)}
-Rinso : ${psmHit(document.getElementById('psm6').value)}
-Kahf : ${psmHit(document.getElementById('psm7').value)}
-H&S : ${psmHit(document.getElementById('psm8').value)}
-Colagena : ${psmHit(document.getElementById('psm9').value)}
-
-*CATEGORY* (Rupiah)
-1. TOYS (NS) : ${rp(document.getElementById('cat1').value)}
-2. HBPL (NS) : ${rp(document.getElementById('cat2').value)}
-
-*E-COMMERCE*
-1. FEE BASE (RP) : ${rp(document.getElementById('fee').value)}
-
-Terimakasih`;
-
-  document.getElementById('hasilReport').innerText = teks;
-  navigator.clipboard.writeText(teks);
-  alert("✅ Report sudah dihitung & disalin ke clipboard!");
-}
-</script>
-
-</body>
-</html>
+<table>
+  <tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Total</th></tr>
+  <tr><td>Kopi Latte</td><td>35</td><td>Rp22.000</td><td>Rp770.000</td></tr>
+</table>
