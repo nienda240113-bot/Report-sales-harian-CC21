@@ -3,394 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Report Sales Harian (Cloud Sync)</title>
+    <title>Sales Ranking & Cloud Sync</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; padding: 15px; background-color: #f4f4f9; margin: 0; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; margin-top: 5px; }
-        h3 { color: #007bff; margin-bottom: 10px; font-size: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
-        .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-        label { display: block; font-weight: bold; margin-top: 8px; font-size: 12px; color: #555; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        
-        input[readonly] { background-color: #e9ecef; color: #333; cursor: not-allowed; font-weight: bold; text-align: center; }
-        .readonly-tf { background-color: #e2f0d9 !important; color: #28a745 !important; }
-
-        .flex { display: flex; gap: 8px; flex-wrap: wrap; }
-        .flex > div { flex: 1; min-width: 100px; }
-        
-        .item-row { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 8px; flex-wrap: nowrap; background: #fafafa; padding: 8px; border-radius: 6px; border: 1px solid #eee; overflow-x: auto;}
-        .item-row > div { flex: 1; min-width: 60px; }
-        .item-row > div.name-field { flex: 2; min-width: 120px; }
-        .item-row > div.btn-field { flex: 0 0 35px; min-width: 35px; }
-
-        button { background-color: #28a745; color: white; border: none; padding: 12px 15px; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 14px; font-weight: bold; width: 100%; }
-        button.add { background-color: #007bff; font-size: 12px; padding: 6px 12px; margin-top: 5px; width: auto; }
-        button.del { background-color: #dc3545; padding: 8px; width: 100%; margin-top: 0; font-weight: bold; }
-        button.sync { background-color: #ffc107; color: #333; margin-bottom: 10px; }
-        button:hover { opacity: 0.9; }
-        textarea { width: 100%; height: 380px; margin-top: 10px; padding: 10px; font-family: monospace; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; font-size: 13px; }
-        
-        #loading { display: none; text-align: center; color: #007bff; font-weight: bold; margin: 10px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h2 {
+            text-align: center;
+            color: #075e54;
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #444;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 6px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            box-sizing: border-box;
+        }
+        .row-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .col {
+            flex: 1;
+        }
+        button {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #128c7e; }
+        .btn-cloud {
+            background-color: #f39c12;
+        }
+        .btn-cloud:hover { background-color: #d68910; }
+        .loading {
+            text-align: center;
+            color: #075e54;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: none;
+        }
+        .status-sync {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .preview-box {
+            background: #e5ddd5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #d4d4d4;
+        }
+        .whatsapp-bubble {
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            line-height: 1.4;
+            border-left: 4px solid #25d366;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn-wa {
+            background-color: #25d366;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Form Report Sales Harian</h2>
-    <div id="loading">Sedang memuat / menyimpan data ke server...</div>
-    
-    <!-- TOMBOL SYNC / CLOUD -->
-    <button class="sync" onclick="loadDataFromCloud()">📥 Ambil Data Terbaru dari Cloud</button>
-    <button onclick="saveDataToCloud()" style="background-color: #6610f2; margin-bottom: 15px;">☁️ Simpan Data ke Cloud (Semua Perangkat)</button>
+    <h2>📱 Sales Ranking & Cloud Sync</h2>
+    <p class="subtitle">Data tersinkron otomatis di semua HP & Perangkat</p>
+    <div id="syncStatus" class="status-sync">Memuat data dari Cloud...</div>
 
+    <!-- Tombol Sinkronisasi Cloud -->
+    <div class="section" style="background: #fff8e1; border-color: #ffe0b2;">
+        <button class="btn-cloud" onclick="loadFromCloud()">☁️ Ambil Data Terbaru dari Cloud (Semua HP)</button>
+    </div>
+
+    <!-- Opsi 1: Upload Screenshot -->
     <div class="section">
-        <h3>1. Data Toko</h3>
-        <div class="flex">
-            <div><label>Periode (Otomatis)</label><input type="text" id="periode" readonly></div>
-            <div><label>WH</label><input type="text" id="wh" value="Bekasi"></div>
-            <div><label>AM</label><input type="text" id="am" value="SRD"></div>
+        <label>📷 Opsi 1: Upload Screenshot Tabel</label>
+        <input type="file" id="imageInput" accept="image/*">
+        <button onclick="processImage()" style="background-color: #075e54;">🔍 Baca Teks dari Screenshot</button>
+        <div id="loadingText" class="loading">⏳ Sedang membaca teks... Harap tunggu.</div>
+    </div>
+
+    <!-- Opsi 3: Masukkan 2 Kolom Terpisah -->
+    <div class="section" style="background: #f0f7f4; border-color: #c2e0d1;">
+        <label style="color: #075e54;">📋 Opsi 3: Masukkan 2 Kolom Terpisah (Nama & Angka/ACV)</label>
+        <div class="row-inputs">
+            <div class="col">
+                <label style="font-size:0.75rem;">Kolom 1 (Nama Toko):</label>
+                <textarea id="inputStores" placeholder="CIBUNTU&#10;WARUNG SENGON&#10;KP TANGSI"></textarea>
+            </div>
+            <div class="col">
+                <label style="font-size:0.75rem;">Kolom 2 (Angka/ACV%):</label>
+                <textarea id="inputValues" placeholder="64%&#10;98%&#10;143%"></textarea>
+            </div>
         </div>
-        <div class="flex">
-            <div><label>AC</label><input type="text" id="ac" value="Triyanto"></div>
-            <div><label>KD Toko</label><input type="text" id="kd" value="CC21"></div>
-            <div><label>Nama Toko</label><input type="text" id="nama" value="TOKO CC21 KUTN"></div>
-            <div><label>Shift</label><input type="text" id="shift" value="1"></div>
+        <button onclick="processTwoColumns()">⚡ Gabungkan & Buat Ranking</button>
+    </div>
+
+    <!-- Opsi 2: Format Lengkap -->
+    <div class="section">
+        <label>✏️ Opsi 2: Format Lengkap (Nama | Target | Total | ACV%)</label>
+        <textarea id="rawInput" placeholder="RAWA JULANG | 51 | 61 | 121%"></textarea>
+        <button onclick="generateReport()">⚡ Proses & Simpan ke Cloud</button>
+    </div>
+
+    <div class="section" id="resultSection" style="display:none; background: #fff;">
+        <label>💬 Preview Pesan WhatsApp:</label>
+        <div class="preview-box">
+            <div class="whatsapp-bubble" id="waPreview"></div>
+            <a id="sendWaBtn" href="#" target="_blank" class="btn-wa">📤 Kirim ke Grup WhatsApp</a>
         </div>
-    </div>
-
-    <div class="section">
-        <h3>2. Revenue</h3>
-        <div class="flex">
-            <div><label>Time Factor (%) (Otomatis)</label><input type="number" id="tf_pct" class="readonly-tf" step="0.1"></div>
-            <div><label>Target MTD (Rp)</label><input type="number" id="target_mtd" value="345059891"></div>
-            <div><label>Actual (Rp)</label><input type="number" id="actual_mtd" value="4646000"></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <h3>3. Fokus Cabang</h3>
-        <div id="fc_container"></div>
-        <button class="add" onclick="addFC('', 0, 0)">+ Tambah Item Fokus Cabang</button>
-    </div>
-
-    <div class="section">
-        <h3>4. Member</h3>
-        <div class="flex">
-            <div><label>Actual NEW MEMBER</label><input type="number" id="new_member" value="0"></div>
-            <div><label>Struk Member</label><input type="number" id="struk_member" value="47"></div>
-            <div><label>Total Struk</label><input type="number" id="total_struk" value="69"></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <h3>5. PSM</h3>
-        <div id="psm_container"></div>
-        <button class="add" onclick="addPSM('', 0, 0)">+ Tambah Item PSM</button>
-    </div>
-
-    <div class="section">
-        <h3>6. Category & E-Commerce</h3>
-        <div class="flex">
-            <div><label>TOYS NS (Rp)</label><input type="number" id="toys" value="0"></div>
-            <div><label>HBPL NS (Rp)</label><input type="number" id="hbpl" value="0"></div>
-            <div><label>E-Commerce Fee (Rp)</label><input type="number" id="ecomm" value="25000"></div>
-        </div>
-    </div>
-
-    <button onclick="generateReport()">Generate & Hitung Otomatis</button>
-
-    <div class="section" style="border: none;">
-        <h3>Hasil Report (Siap Copy ke WA)</h3>
-        <textarea id="output" readonly></textarea>
-        <button onclick="copyText()" style="background-color: #17a2b8;">Copy Text</button>
     </div>
 </div>
 
 <script>
-    // URL Web App Google Apps Script Anda yang baru
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyw-bgszmBT98E5L5XtStE7wKJWlfqNV13pSLp6EEPwlNtM_QVjdd0lH_LAXiy_zrMP/exec";
+    // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI:
+    const WEB_APP_URL = "GANTI_DENGAN_URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA";
 
-    // Set Tanggal & Time Factor Otomatis
-    const today = new Date();
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const tanggal = today.getDate();
-    const bulan = today.getMonth();
-    const tahun = today.getFullYear();
-    
-    document.getElementById('periode').value = `${tanggal} ${namaBulan[bulan]}`;
-    const totalHariBulanIni = new Date(tahun, bulan + 1, 0).getDate();
-    document.getElementById('tf_pct').value = ((tanggal / totalHariBulanIni) * 100).toFixed(1);
+    window.onload = function() {
+        if(!WEB_APP_URL.includes("GANTI_DENGAN")) {
+            loadFromCloud();
+        } else {
+            document.getElementById('syncStatus').innerText = "URL Cloud belum diatur di dalam kode.";
+        }
+    };
 
-    function hitungPersenLayar(element) {
-        let row = element.parentElement.parentElement;
-        let target = parseInt(row.querySelector('.inp-target').value) || 0;
-        let actual = parseInt(row.querySelector('.inp-actual').value) || 0;
-        let outputPct = row.querySelector('.out-pct');
-        outputPct.value = target === 0 ? "0%" : Math.round((actual / target) * 100) + "%";
-    }
+    function loadFromCloud() {
+        if(WEB_APP_URL.includes("GANTI_DENGAN")) {
+            alert("Harap masukkan URL Web App Google Apps Script terlebih dahulu!");
+            return;
+        }
+        document.getElementById('syncStatus').innerText = "Sedang mengambil data terbaru dari Cloud...";
 
-    const initialFC = [
-        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, actual: 0},
-        {name: "SERBA GRATIS (PAKET)", target: 17, actual: 0},
-        {name: "SEUUGER", target: 40, actual: 0},
-        {name: "PROMO CEBAN", target: 69, actual: 0}
-    ];
+        fetch(WEB_APP_URL)
+            .then(response => response.json())
+            .then(data => {
+                // data berupa array baris dari spreadsheet (baris 0 adalah header)
+                if(data && data.length > 1) {
+                    let rawText = "";
+                    let storesCol = "";
+                    let valuesCol = "";
 
-    const initialPSM = [
-        {name: "Le mineral", target: 210, actual: 8},
-        {name: "Nescafe", target: 75, actual: 6},
-        {name: "Happy tos", target: 33, actual: 1},
-        {name: "Sedaap", target: 66, actual: 10},
-        {name: "Roma", target: 45, actual: 3},
-        {name: "Rinso", target: 17, actual: 18},
-        {name: "Kahf", target: 24, actual: 0},
-        {name: "H&S", target: 12, actual: 0},
-        {name: "Colagena", target: 55, actual: 0}
-    ];
+                    for(let i = 1; i < data.length; i++) {
+                        let name = data[i][0] || "";
+                        let target = data[i][1] || 0;
+                        let total = data[i][2] || 0;
+                        let acv = data[i][3] || 0;
 
-    function addFC(name, target, actual) {
-        let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
-        const div = document.createElement('div');
-        div.className = 'item-row fc-row';
-        div.innerHTML = `
-            <div class="name-field"><label>Nama Item</label><input type="text" class="fc_name" value="${name}"></div>
-            <div><label>Target</label><input type="number" class="fc_target inp-target" value="${target}" oninput="hitungPersenLayar(this)"></div>
-            <div><label>Actual</label><input type="number" class="fc_actual inp-actual" value="${actual}" oninput="hitungPersenLayar(this)"></div>
-            <div><label>%</label><input type="text" class="out-pct" value="${pct}%" readonly tabindex="-1"></div>
-            <div class="btn-field"><label>&nbsp;</label><button class="del" onclick="this.parentElement.parentElement.remove()" tabindex="-1">✕</button></div>
-        `;
-        document.getElementById('fc_container').appendChild(div);
-    }
+                        if(name) {
+                            rawText += `${name} | ${target} | ${total} | ${acv}%\n`;
+                            storesCol += `${name}\n`;
+                            valuesCol += `${acv}%\n`;
+                        }
+                    }
 
-    function addPSM(name, target, actual) {
-        let pct = target === 0 ? 0 : Math.round((actual / target) * 100);
-        const div = document.createElement('div');
-        div.className = 'item-row psm-row';
-        div.innerHTML = `
-            <div class="name-field"><label>Nama Item</label><input type="text" class="psm_name" value="${name}"></div>
-            <div><label>Target</label><input type="number" class="psm_target inp-target" value="${target}" oninput="hitungPersenLayar(this)"></div>
-            <div><label>Actual</label><input type="number" class="psm_actual inp-actual" value="${actual}" oninput="hitungPersenLayar(this)"></div>
-            <div><label>%</label><input type="text" class="out-pct" value="${pct}%" readonly tabindex="-1"></div>
-            <div class="btn-field"><label>&nbsp;</label><button class="del" onclick="this.parentElement.parentElement.remove()" tabindex="-1">✕</button></div>
-        `;
-        document.getElementById('psm_container').appendChild(div);
-    }
-
-    initialFC.forEach(f => addFC(f.name, f.target, f.actual));
-    initialPSM.forEach(p => addPSM(p.name, p.target, p.actual));
-
-    function formatRp(angka) {
-        return "Rp " + Math.round(angka).toLocaleString('id-ID').replace(/,/g, ".");
-    }
-
-    // --- FUNGSI CLOUD SYNC (JSONP & Form Submit Aman CORS) ---
-    function saveDataToCloud() {
-        document.getElementById('loading').style.display = 'block';
-
-        let data = {
-            wh: document.getElementById('wh').value,
-            am: document.getElementById('am').value,
-            ac: document.getElementById('ac').value,
-            kd: document.getElementById('kd').value,
-            nama: document.getElementById('nama').value,
-            shift: document.getElementById('shift').value,
-            target_mtd: document.getElementById('target_mtd').value,
-            actual_mtd: document.getElementById('actual_mtd').value,
-            new_member: document.getElementById('new_member').value,
-            struk_member: document.getElementById('struk_member').value,
-            total_struk: document.getElementById('total_struk').value,
-            toys: document.getElementById('toys').value,
-            hbpl: document.getElementById('hbpl').value,
-            ecomm: document.getElementById('ecomm').value,
-            fc: [],
-            psm: []
-        };
-
-        document.querySelectorAll('.fc-row').forEach(row => {
-            data.fc.push({
-                name: row.querySelector('.fc_name').value,
-                target: row.querySelector('.fc_target').value,
-                actual: row.querySelector('.fc_actual').value
+                    document.getElementById('rawInput').value = rawText.trim();
+                    document.getElementById('inputStores').value = storesCol.trim();
+                    document.getElementById('inputValues').value = valuesCol.trim();
+                    
+                    document.getElementById('syncStatus').innerText = "Data berhasil disinkronkan dari Cloud!";
+                    generateReport(false); // Buat preview tanpa kirim ulang ke cloud
+                } else {
+                    document.getElementById('syncStatus').innerText = "Cloud masih kosong.";
+                }
+            })
+            .catch(error => {
+                document.getElementById('syncStatus').innerText = "Gagal memuat dari Cloud.";
+                console.error(error);
             });
+    }
+
+    function saveToCloud(storesArray) {
+        if(WEB_APP_URL.includes("GANTI_DENGAN")) return;
+
+        document.getElementById('syncStatus').innerText = "Menyimpan ke Cloud...";
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ stores: storesArray })
+        }).then(() => {
+            document.getElementById('syncStatus').innerText = "Data berhasil disimpan & tersinkron ke Cloud!";
+        }).catch(error => {
+            document.getElementById('syncStatus').innerText = "Gagal menyimpan ke Cloud.";
+            console.error(error);
         });
+    }
 
-        document.querySelectorAll('.psm-row').forEach(row => {
-            data.psm.push({
-                name: row.querySelector('.psm_name').value,
-                target: row.querySelector('.psm_target').value,
-                actual: row.querySelector('.psm_actual').value
-            });
+    function processImage() {
+        let fileInput = document.getElementById('imageInput');
+        if(fileInput.files.length === 0) {
+            alert("Pilih file screenshot terlebih dahulu!");
+            return;
+        }
+        let file = fileInput.files[0];
+        let loadingDiv = document.getElementById('loadingText');
+        loadingDiv.style.display = 'block';
+
+        Tesseract.recognize(file, 'ind', { logger: m => console.log(m) }).then(({ data: { text } }) => {
+            loadingDiv.style.display = 'none';
+            document.getElementById('rawInput').value = text;
+            alert("Berhasil membaca gambar!");
+        }).catch(err => {
+            loadingDiv.style.display = 'none';
+            alert("Gagal membaca gambar.");
+            console.error(err);
         });
+    }
 
-        let jsonData = JSON.stringify(data);
-        
-        // Menggunakan form tersembunyi agar tidak kena error CORS di browser HP
-        let form = document.createElement('form');
-        form.action = WEB_APP_URL;
-        form.method = 'POST';
-        form.target = 'hidden_iframe';
+    function processTwoColumns() {
+        let storesText = document.getElementById('inputStores').value.trim();
+        let valuesText = document.getElementById('inputValues').value.trim();
 
-        let input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'data';
-        input.value = jsonData;
-        form.appendChild(input);
-
-        let iframe = document.getElementById('hidden_iframe');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.name = 'hidden_iframe';
-            iframe.id = 'hidden_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
+        if(!storesText || !valuesText) {
+            alert("Kolom Nama Toko dan Kolom Angka harus diisi keduanya!");
+            return;
         }
 
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        let storeLines = storesText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+        let valueLines = valuesText.split('\n').map(v => v.trim()).filter(v => v.length > 0);
 
-        setTimeout(() => {
-            document.getElementById('loading').style.display = 'none';
-            alert("Data berhasil disimpan ke Cloud!");
-        }, 1200);
+        let combinedText = "";
+        let minLength = Math.min(storeLines.length, valueLines.length);
+
+        for(let i = 0; i < minLength; i++) {
+            let name = storeLines[i];
+            let valStr = valueLines[i];
+            let acv = parseFloat(valStr.replace('%', '').replace(/[^0-9.]/g, '')) || 0;
+            combinedText += `${name} | 0 | 0 | ${acv}%\n`;
+        }
+
+        document.getElementById('rawInput').value = combinedText;
+        generateReport(true);
     }
 
-    function loadDataFromCloud() {
-        document.getElementById('loading').style.display = 'block';
+    function generateReport(isSave = true) {
+        let input = document.getElementById('rawInput').value.trim();
+        if(!input) {
+            alert("Data toko masih kosong!");
+            return;
+        }
 
-        // Menggunakan JSONP untuk bypass CORS
-        let callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
-        window[callbackName] = function(data) {
-            document.getElementById('loading').style.display = 'none';
-            delete window[callbackName];
-            document.body.removeChild(script);
+        let lines = input.split('\n');
+        let stores = [];
+        let storesForCloud = [];
 
-            if(!data || Object.keys(data).length === 0) {
-                alert("Data cloud masih kosong.");
-                return;
+        lines.forEach(line => {
+            let cleanLine = line.replace(/[^\w\s\|\%\.\-]/gi, '');
+            let parts = cleanLine.split('|').map(p => p.trim());
+            
+            if(parts.length >= 4) {
+                let name = parts[0];
+                let target = parseFloat(parts[1].replace(/[^0-9.]/g, '')) || 0;
+                let total = parseFloat(parts[2].replace(/[^0-9.]/g, '')) || 0;
+                let acvStr = parts[3].replace('%', '').replace(/[^0-9.]/g, '');
+                let acv = parseFloat(acvStr) || 0;
+                
+                if(name) {
+                    stores.push({ name, target, total, acv });
+                    storesForCloud.push({ name: name, target: target, total: total, acv: acv });
+                }
             }
-
-            document.getElementById('wh').value = data.wh || '';
-            document.getElementById('am').value = data.am || '';
-            document.getElementById('ac').value = data.ac || '';
-            document.getElementById('kd').value = data.kd || '';
-            document.getElementById('nama').value = data.nama || '';
-            document.getElementById('shift').value = data.shift || '';
-            document.getElementById('target_mtd').value = data.target_mtd || 0;
-            document.getElementById('actual_mtd').value = data.actual_mtd || 0;
-            document.getElementById('new_member').value = data.new_member || 0;
-            document.getElementById('struk_member').value = data.struk_member || 0;
-            document.getElementById('total_struk').value = data.total_struk || 0;
-            document.getElementById('toys').value = data.toys || 0;
-            document.getElementById('hbpl').value = data.hbpl || 0;
-            document.getElementById('ecomm').value = data.ecomm || 0;
-
-            if(data.fc && data.fc.length > 0) {
-                document.getElementById('fc_container').innerHTML = '';
-                data.fc.forEach(f => addFC(f.name, f.target, f.actual));
-            }
-
-            if(data.psm && data.psm.length > 0) {
-                document.getElementById('psm_container').innerHTML = '';
-                data.psm.forEach(p => addPSM(p.name, p.target, p.actual));
-            }
-
-            alert("Data terbaru berhasil dimuat dari Cloud!");
-        };
-
-        let script = document.createElement('script');
-        script.src = `${WEB_APP_URL}?callback=${callbackName}`;
-        script.onerror = function() {
-            document.getElementById('loading').style.display = 'none';
-            alert("Gagal memuat data dari Cloud. Pastikan koneksi internet stabil.");
-        };
-        document.body.appendChild(script);
-    }
-
-    function generateReport() {
-        let tf_pct = parseFloat(document.getElementById('tf_pct').value) || 0;
-        let target_mtd = parseFloat(document.getElementById('target_mtd').value) || 0;
-        let actual_mtd = parseFloat(document.getElementById('actual_mtd').value) || 0;
-
-        let target_tf = target_mtd * (tf_pct / 100);
-        let ach_mtd = target_mtd === 0 ? 0 : (actual_mtd / target_mtd) * 100;
-        let ach_tf = target_tf === 0 ? 0 : (actual_mtd / target_tf) * 100;
-        let gap_target = target_mtd - actual_mtd;
-        let gap_tf = target_tf - actual_mtd;
-
-        let str_member = parseInt(document.getElementById('struk_member').value) || 0;
-        let tot_struk = parseInt(document.getElementById('total_struk').value) || 0;
-        let pct_member = tot_struk === 0 ? 0 : Math.round((str_member / tot_struk) * 100);
-
-        let report = `REPORT SALES HARIAN\n`;
-        report += `PERIODE : ${document.getElementById('periode').value}\n`;
-        report += `WH : ${document.getElementById('wh').value}\n`;
-        report += `AM : ${document.getElementById('am').value}\n`;
-        report += `AC : ${document.getElementById('ac').value}\n`;
-        report += `KD Toko : ${document.getElementById('kd').value}\n`;
-        report += `Nama Toko : ${document.getElementById('nama').value}\n`;
-        report += `Shift : ${document.getElementById('shift').value}\n`;
-        report += `======================\n\n`;
-
-        report += `*REVENUE*\n`;
-        report += `1. NET SALES\n`;
-        report += `- Time factor: ${tf_pct}%\n`;
-        report += `- TARGET MTD :${formatRp(target_mtd)}\n`;
-        report += `- Target Time Factor: ${formatRp(target_tf)}\n`;
-        report += `- ACTUAL :${formatRp(actual_mtd)}\n`;
-        report += `- ACHIVE MTD:${ach_mtd.toFixed(2)}%\n`;
-        report += `- AChieved Time Factor :${ach_tf.toFixed(2)}%\n`;
-        report += `- GAP TO TARGET :${formatRp(gap_target)}\n`;
-        report += `- GAP To Time Factor:${formatRp(gap_tf)}\n\n`;
-
-        report += `*FOKUS CABANG*\n======================\n`;
-        report += `TARGET / SALES / ACV%\n`;
-        let fcRows = document.querySelectorAll('.fc-row');
-        fcRows.forEach((row, idx) => {
-            let n = row.querySelector('.fc_name').value;
-            let t = parseInt(row.querySelector('.fc_target').value) || 0;
-            let a = parseInt(row.querySelector('.fc_actual').value) || 0;
-            let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${idx + 1}. ${n} : ${t} / ${a} / ${p}%\n`;
         });
-        report += `======================\n`;
 
-        report += `*MEMBER*\n`;
-        report += `1. Actual NEW MEMBER :${document.getElementById('new_member').value}\n`;
-        report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk = ${str_member} / ${tot_struk} / ${pct_member}%\n`;
-        report += `======================\n`;
+        if(stores.length === 0) {
+            alert("Format data belum sesuai. Pastikan menggunakan pemisah '|' atau gunakan Opsi 3.");
+            return;
+        }
 
-        report += `*PSM*(In Qty).\n( Target / actual / %)\n`;
-        let psmRows = document.querySelectorAll('.psm-row');
-        psmRows.forEach(row => {
-            let n = row.querySelector('.psm_name').value;
-            let t = parseInt(row.querySelector('.psm_target').value) || 0;
-            let a = parseInt(row.querySelector('.psm_actual').value) || 0;
-            let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            if(n.trim() !== '') report += `${n} : ${t} / ${a} / ${p}%\n`;
+        if(isSave) {
+            saveToCloud(storesForCloud);
+        }
+
+        // Urutkan berdasarkan ACV tertinggi ke terendah
+        stores.sort((a, b) => b.acv - a.acv);
+
+        let top5 = stores.slice(0, 5);
+        let bottom5 = stores.slice(-5).reverse();
+
+        let dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        let message = `📊 *LAPORAN SALES HARIAN* 📊\n`;
+        message += `📅 Tanggal: ${dateStr}\n\n`;
+
+        message += `🏆 *TOP 5 TOKO TERBAIK:*\n`;
+        top5.forEach((s, idx) => {
+            message += `${idx + 1}. *${s.name}* — *${s.acv.toFixed(0)}%*\n`;
         });
-        report += `======================\n`;
 
-        report += `*CATEGORY* (Rupiah)\n`;
-        report += `1. TOYS (NS) : ${formatRp(parseInt(document.getElementById('toys').value) || 0)}\n`;
-        report += `2. HBPL (NS) : ${formatRp(parseInt(document.getElementById('hbpl').value) || 0)}\n`;
-        report += `======================\n`;
+        message += `\n⚠️ *5 TOKO TERENDAH / PERLU PERHATIAN:*\n`;
+        bottom5.forEach((s, idx) => {
+            message += `${idx + 1}. *${s.name}* — *${s.acv.toFixed(0)}%*\n`;
+        });
 
-        report += `*E-COMMERCE*\n`;
-        report += `1. FEE BASE (RP) : ${formatRp(parseInt(document.getElementById('ecomm').value) || 0)}\n\n`;
-        report += `Terimakasih`;
+        message += `\n_Dibuat secara otomatis oleh Sistem Sales Report_`;
 
-        document.getElementById('output').value = report;
-    }
+        document.getElementById('waPreview').innerText = message;
+        document.getElementById('resultSection').style.display = 'block';
 
-    function copyText() {
-        let text = document.getElementById("output");
-        text.select();
-        document.execCommand("copy");
-        alert("Report berhasil di-copy!");
+        let encodedMessage = encodeURIComponent(message);
+        document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encodedMessage}`;
     }
 </script>
 
 </body>
-</html>
+    </html>
