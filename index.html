@@ -161,7 +161,7 @@
     <div class="section">
         <label>⚙️ Informasi Umum</label>
         <div class="row-grid">
-            <div><label style="font-size:0.75rem;">Periode:</label><input type="text" id="periode" value="29 Agustus"></div>
+            <div><label style="font-size:0.75rem;">Periode:</label><input type="text" id="periode"></div>
             <div><label style="font-size:0.75rem;">Shift:</label><input type="text" id="shift" value="1"></div>
         </div>
         <div class="row-grid">
@@ -254,7 +254,7 @@
 </div>
 
 <script>
-    // Data default Fokus Cabang sesuai permintaan
+    // Data default Fokus Cabang
     const defaultFokus = [
         {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, onhand: 0},
         {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, onhand: 0},
@@ -262,7 +262,7 @@
         {name: "PROMO CEBAN", target: 69, sales: 0, onhand: 0}
     ];
 
-    // Data default PSM sesuai permintaan
+    // Data default PSM
     const defaultPsm = [
         {name: "Le mineral", target: 210, actual: 8},
         {name: "Nescafe", target: 75, actual: 6},
@@ -275,10 +275,26 @@
         {name: "Colagena", target: 55, actual: 0}
     ];
 
+    // Fungsi untuk mendapatkan format tanggal otomatis dari HP (Contoh: "30 Agustus")
+    function getTodayDateString() {
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const now = new Date();
+        const day = now.getDate();
+        const month = months[now.getMonth()];
+        return `${day} ${month}`;
+    }
+
     window.onload = function() {
         loadTableData();
+        
+        // Cek apakah sudah ada data tersimpan di HP, jika belum gunakan tanggal hari ini
         if(localStorage.getItem('cc21_periode')) {
-            document.getElementById('periode').value = localStorage.getItem('cc21_periode') || '';
+            document.getElementById('periode').value = localStorage.getItem('cc21_periode');
+        } else {
+            document.getElementById('periode').value = getTodayDateString();
+        }
+
+        if(localStorage.getItem('cc21_shift')) {
             document.getElementById('shift').value = localStorage.getItem('cc21_shift') || '';
             document.getElementById('wh_am_ac').value = localStorage.getItem('cc21_wh_am_ac') || '';
             document.getElementById('toko').value = localStorage.getItem('cc21_toko') || '';
@@ -457,34 +473,4 @@
         let savedPsm = JSON.parse(localStorage.getItem('cc21_psm_table')) || defaultPsm;
         savedPsm.forEach((item, idx) => {
             let name = document.getElementById(`psm_name_${idx}`).value;
-            let target = parseFloat(document.getElementById(`psm_target_${idx}`).value) || 0;
-            let actualPsm = parseFloat(document.getElementById(`psm_actual_${idx}`).value) || 0;
-            let psmAcv = target > 0 ? Math.round((actualPsm / target) * 100) + '%' : '0%';
-            msg += `${name} : ${target}/${actualPsm}/${psmAcv}\n`;
-        });
-
-        let toysVal = document.getElementById('toys').value;
-        let hbplVal = document.getElementById('hbpl').value;
-        let ecomVal = document.getElementById('ecommerce').value;
-
-        msg += `======================\n`;
-        msg += `*CATEGORY* (Rupiah)\n`;
-        msg += `1. TOYS (NS) : Rp ${toysVal}\n`;
-        msg += `2. HBPL (NS) : Rp ${hbplVal}\n`;
-        msg += `======================\n`;
-        msg += `*E-COMMERCE*\n`;
-        msg += `1. FEE BASE (RP) : Rp ${ecomVal}\n\n`;
-        msg += `Terimakasih`;
-
-        localStorage.setItem('cc21_preview', msg);
-
-        document.getElementById('waPreview').innerText = msg;
-        document.getElementById('resultSection').style.display = 'block';
-
-        let encoded = encodeURIComponent(msg);
-        document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encoded}`;
-    }
-</script>
-
-</body>
-</html>
+            let tar
