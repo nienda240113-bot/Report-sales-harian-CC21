@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Sales Harian CC21 (Auto-Calc)</title>
+    <title>Report Sales Harian CC21 (Table Form)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 650px;
+            max-width: 700px;
             margin: 0 auto;
             background: #ffffff;
             padding: 20px;
@@ -46,7 +46,7 @@
             font-size: 0.85rem;
             color: #444;
         }
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -54,17 +54,50 @@
             font-size: 0.85rem;
             box-sizing: border-box;
             margin-bottom: 8px;
+            background: #fff;
         }
-        textarea {
-            height: 110px;
-            font-family: monospace;
+        .row-grid {
+            display: flex;
+            gap: 8px;
+        }
+        .row-grid > div {
+            flex: 1;
+        }
+        table.input-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        table.input-table th {
+            background: #075e54;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        table.input-table td {
+            padding: 6px;
+            border-bottom: 1px solid #eee;
+        }
+        table.input-table input {
+            margin-bottom: 0;
+            padding: 5px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        table.input-table input.item-name {
+            text-align: left;
         }
         .hint {
             font-size: 0.75rem;
             color: #666;
             font-style: italic;
-            margin-top: -4px;
-            margin-bottom: 8px;
+            margin-top: 4px;
             display: block;
         }
         button {
@@ -121,75 +154,94 @@
 <body>
 
 <div class="container">
-    <h2>📋 Report Sales Harian CC21 (Auto Calc)</h2>
-    <p class="subtitle">Persentase & GAP dihitung otomatis</p>
+    <h2>📋 Report Sales Harian CC21</h2>
+    <p class="subtitle">Kolom Terstruktur & Hitung Otomatis</p>
 
+    <!-- Informasi Umum -->
     <div class="section">
         <label>⚙️ Informasi Umum</label>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Periode:</label><input type="text" id="periode" value="29 Agustus" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Shift:</label><input type="text" id="shift" value="1" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Periode:</label><input type="text" id="periode" value="29 Agustus"></div>
+            <div><label style="font-size:0.75rem;">Shift:</label><input type="text" id="shift" value="1"></div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">WH / AM / AC:</label><input type="text" id="wh_am_ac" value="Bekasi / Syahrul / Triyanto" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">KD & Nama Toko:</label><input type="text" id="toko" value="CC21 / TOKO CC21 KUTN" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">WH / AM / AC:</label><input type="text" id="wh_am_ac" value="Bekasi / Syahrul / Triyanto"></div>
+            <div><label style="font-size:0.75rem;">KD & Nama Toko:</label><input type="text" id="toko" value="CC21 / TOKO CC21 KUTN"></div>
         </div>
     </div>
 
+    <!-- Revenue -->
     <div class="section">
         <label>💰 REVENUE (Net Sales)</label>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Time Factor (%):</label><input type="text" id="tf" value="87.1%" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Actual (Rp):</label><input type="text" id="actual" value="4646000" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Time Factor (%):</label><input type="text" id="tf" value="87.1%"></div>
+            <div><label style="font-size:0.75rem;">Actual (Rp):</label><input type="text" id="actual" value="4646000"></div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Target MTD (Rp):</label><input type="text" id="target_mtd" value="345059891" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Target TF (Rp):</label><input type="text" id="target_tf" value="300547165" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Target MTD (Rp):</label><input type="text" id="target_mtd" value="345059891"></div>
+            <div><label style="font-size:0.75rem;">Target TF (Rp):</label><input type="text" id="target_tf" value="300547165"></div>
         </div>
-        <span class="hint">*(Masukkan angka bersih tanpa titik/koma, misal: 4646000)*</span>
+        <span class="hint">Persentase Achievement & GAP dihitung otomatis.</span>
     </div>
 
+    <!-- Fokus Cabang -->
     <div class="section">
-        <label>🎯 FOKUS CABANG (Format: Nama : Target / Sales / OnHand)</label>
-        <span class="hint">ACV% akan dihitung otomatis. Contoh: TEBUS MURAH : 20 / 5 / 2</span>
-        <textarea id="fokus" oninput="saveData()">TEBUS MURAH (QTY REDEEM) : 20 / 0 / 0
-SERBA GRATIS (PAKET) : 17 / 0 / 0
-SEUUGER : 40 / 0 / 0
-PROMO CEBAN : 69 / 0 / 0</textarea>
+        <label>🎯 FOKUS CABANG</label>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th style="width:40%;">Nama Program</th>
+                    <th style="width:20%;">Target</th>
+                    <th style="width:20%;">Sales</th>
+                    <th style="width:20%;">OnHand</th>
+                </tr>
+            </thead>
+            <tbody id="fokusTableBody">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </tbody>
+        </table>
+        <span class="hint">ACV% dihitung otomatis.</span>
     </div>
 
+    <!-- Member -->
     <div class="section">
         <label>👥 MEMBER & STRUK</label>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Actual New Member:</label><input type="text" id="new_member" value="0" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Struk Member / Total Struk:</label><input type="text" id="struk_input" value="47 / 69" placeholder="47 / 69" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Actual New Member:</label><input type="text" id="new_member" value="0"></div>
+            <div><label style="font-size:0.75rem;">Struk Member:</label><input type="text" id="struk_member" value="47"></div>
+            <div><label style="font-size:0.75rem;">Total Struk:</label><input type="text" id="total_struk" value="69"></div>
         </div>
-        <span class="hint">*(Persentase struk member dihitung otomatis dari Struk Member dibagi Total Struk)*</span>
     </div>
 
+    <!-- PSM -->
     <div class="section">
-        <label>📦 PSM (Format: Nama : Target / Actual)</label>
-        <span class="hint">Persentase (%) dihitung otomatis. Contoh: Le mineral : 210 / 8</span>
-        <textarea id="psm" oninput="saveData()">Le mineral : 210 / 8
-Nescafe : 75 / 6
-Happy tos : 33 / 1
-Sedaap : 66 / 10
-Roma : 45 / 3
-Rinso : 17 / 18
-Kahf : 24 / 0
-H&S : 12 / 0
-Colagena : 55 / 0</textarea>
+        <label>📦 PSM (Product Sales Mission)</label>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th style="width:50%;">Nama Item PSM</th>
+                    <th style="width:25%;">Target</th>
+                    <th style="width:25%;">Actual</th>
+                </tr>
+            </thead>
+            <tbody id="psmTableBody">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </tbody>
+        </table>
+        <span class="hint">Persentase (%) PSM dihitung otomatis.</span>
     </div>
 
+    <!-- Category & E-Commerce -->
     <div class="section">
         <label>🏷️ CATEGORY & E-COMMERCE</label>
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Toys & HBPL (Rp):</label><input type="text" id="category" value="TOYS (NS) : Rp 0&#10;HBPL (NS) : Rp 0" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">E-Commerce Fee Base (Rp):</label><input type="text" id="ecommerce" value="25.000" oninput="saveData()"></div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Toys (NS Rp):</label><input type="text" id="toys" value="0"></div>
+            <div><label style="font-size:0.75rem;">HBPL (NS Rp):</label><input type="text" id="hbpl" value="0"></div>
+            <div><label style="font-size:0.75rem;">E-Commerce Fee Base (Rp):</label><input type="text" id="ecommerce" value="25.000"></div>
         </div>
     </div>
 
-    <button onclick="generateReport()">⚡ Hitung & Buat Laporan</button>
+    <button onclick="generateReport()">⚡ Hitung & Buat Laporan WhatsApp</button>
     <button class="btn-clear" onclick="clearData()">🗑️ Reset Data</button>
 
     <div class="section" id="resultSection" style="display:none; background: #fff; margin-top: 15px;">
@@ -202,187 +254,222 @@ Colagena : 55 / 0</textarea>
 </div>
 
 <script>
-window.onload = function() {
-    if(localStorage.getItem('cc21_periode')) {
-        document.getElementById('periode').value = localStorage.getItem('cc21_periode');
-        document.getElementById('shift').value = localStorage.getItem('cc21_shift');
-        document.getElementById('wh_am_ac').value = localStorage.getItem('cc21_wh_am_ac');
-        document.getElementById('toko').value = localStorage.getItem('cc21_toko');
-        document.getElementById('tf').value = localStorage.getItem('cc21_tf');
-        document.getElementById('actual').value = localStorage.getItem('cc21_actual');
-        document.getElementById('target_mtd').value = localStorage.getItem('cc21_target_mtd');
-        document.getElementById('target_tf').value = localStorage.getItem('cc21_target_tf');
-        document.getElementById('fokus').value = localStorage.getItem('cc21_fokus');
-        document.getElementById('new_member').value = localStorage.getItem('cc21_new_member');
-        document.getElementById('struk_input').value = localStorage.getItem('cc21_struk_input');
-        document.getElementById('psm').value = localStorage.getItem('cc21_psm');
-        document.getElementById('category').value = localStorage.getItem('cc21_category');
-        document.getElementById('ecommerce').value = localStorage.getItem('cc21_ecommerce');
-        
-        if(localStorage.getItem('cc21_preview')) {
-            document.getElementById('waPreview').innerText = localStorage.getItem('cc21_preview');
-            document.getElementById('resultSection').style.display = 'block';
-            let encoded = encodeURIComponent(localStorage.getItem('cc21_preview'));
-            document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encoded}`;
+    // Data default Fokus Cabang & PSM
+    const defaultFokus = [
+        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, onhand: 0},
+        {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, onhand: 0},
+        {name: "SEUUGER", target: 40, sales: 0, onhand: 0},
+        {name: "PROMO CEBAN", target: 69, sales: 0, onhand: 0}
+    ];
+
+    const defaultPsm = [
+        {name: "Le mineral", target: 210, actual: 8},
+        {name: "Nescafe", target: 75, actual: 6},
+        {name: "Happy tos", target: 33, actual: 1},
+        {name: "Sedaap", target: 66, actual: 10},
+        {name: "Roma", target: 45, actual: 3},
+        {name: "Rinso", target: 17, actual: 18},
+        {name: "Kahf", target: 24, actual: 0},
+        {name: "H&S", target: 12, actual: 0},
+        {name: "Colagena", target: 55, actual: 0}
+    ];
+
+    window.onload = function() {
+        loadTableData();
+        if(localStorage.getItem('cc21_periode')) {
+            document.getElementById('periode').value = localStorage.getItem('cc21_periode');
+            document.getElementById('shift').value = localStorage.getItem('cc21_shift');
+            document.getElementById('wh_am_ac').value = localStorage.getItem('cc21_wh_am_ac');
+            document.getElementById('toko').value = localStorage.getItem('cc21_toko');
+            document.getElementById('tf').value = localStorage.getItem('cc21_tf');
+            document.getElementById('actual').value = localStorage.getItem('cc21_actual');
+            document.getElementById('target_mtd').value = localStorage.getItem('cc21_target_mtd');
+            document.getElementById('target_tf').value = localStorage.getItem('cc21_target_tf');
+            document.getElementById('new_member').value = localStorage.getItem('cc21_new_member');
+            document.getElementById('struk_member').value = localStorage.getItem('cc21_struk_member');
+            document.getElementById('total_struk').value = localStorage.getItem('cc21_total_struk');
+            document.getElementById('toys').value = localStorage.getItem('cc21_toys');
+            document.getElementById('hbpl').value = localStorage.getItem('cc21_hbpl');
+            document.getElementById('ecommerce').value = localStorage.getItem('cc21_ecommerce');
+            
+            if(localStorage.getItem('cc21_preview')) {
+                document.getElementById('waPreview').innerText = localStorage.getItem('cc21_preview');
+                document.getElementById('resultSection').style.display = 'block';
+                let encoded = encodeURIComponent(localStorage.getItem('cc21_preview'));
+                document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encoded}`;
+            }
+        }
+    };
+
+    function loadTableData() {
+        // Load Fokus Cabang Table
+        let savedFokus = JSON.parse(localStorage.getItem('cc21_fokus_table')) || defaultFokus;
+        let fokusHtml = '';
+        savedFokus.forEach((item, idx) => {
+            fokusHtml += `<tr>
+                <td><input type="text" class="item-name" id="fokus_name_${idx}" value="${item.name}"></td>
+                <td><input type="number" id="fokus_target_${idx}" value="${item.target}"></td>
+                <td><input type="number" id="fokus_sales_${idx}" value="${item.sales}"></td>
+                <td><input type="number" id="fokus_oh_${idx}" value="${item.onhand}"></td>
+            </tr>`;
+        });
+        document.getElementById('fokusTableBody').innerHTML = fokusHtml;
+
+        // Load PSM Table
+        let savedPsm = JSON.parse(localStorage.getItem('cc21_psm_table')) || defaultPsm;
+        let psmHtml = '';
+        savedPsm.forEach((item, idx) => {
+            psmHtml += `<tr>
+                <td><input type="text" class="item-name" id="psm_name_${idx}" value="${item.name}"></td>
+                <td><input type="number" id="psm_target_${idx}" value="${item.target}"></td>
+                <td><input type="number" id="psm_actual_${idx}" value="${item.actual}"></td>
+            </tr>`;
+        });
+        document.getElementById('psmTableBody').innerHTML = psmHtml;
+    }
+
+    function saveAllData() {
+        localStorage.setItem('cc21_periode', document.getElementById('periode').value);
+        localStorage.setItem('cc21_shift', document.getElementById('shift').value);
+        localStorage.setItem('cc21_wh_am_ac', document.getElementById('wh_am_ac').value);
+        localStorage.setItem('cc21_toko', document.getElementById('toko').value);
+        localStorage.setItem('cc21_tf', document.getElementById('tf').value);
+        localStorage.setItem('cc21_actual', document.getElementById('actual').value);
+        localStorage.setItem('cc21_target_mtd', document.getElementById('target_mtd').value);
+        localStorage.setItem('cc21_target_tf', document.getElementById('target_tf').value);
+        localStorage.setItem('cc21_new_member', document.getElementById('new_member').value);
+        localStorage.setItem('cc21_struk_member', document.getElementById('struk_member').value);
+        localStorage.setItem('cc21_total_struk', document.getElementById('total_struk').value);
+        localStorage.setItem('cc21_toys', document.getElementById('toys').value);
+        localStorage.setItem('cc21_hbpl', document.getElementById('hbpl').value);
+        localStorage.setItem('cc21_ecommerce', document.getElementById('ecommerce').value);
+
+        // Save Fokus Table
+        let fokusData = [];
+        for(let i=0; i<defaultFokus.length; i++) {
+            fokusData.push({
+                name: document.getElementById(`fokus_name_${i}`).value,
+                target: document.getElementById(`fokus_target_${i}`).value,
+                sales: document.getElementById(`fokus_sales_${i}`).value,
+                onhand: document.getElementById(`fokus_oh_${i}`).value
+            });
+        }
+        localStorage.setItem('cc21_fokus_table', JSON.stringify(fokusData));
+
+        // Save PSM Table
+        let psmData = [];
+        for(let i=0; i<defaultPsm.length; i++) {
+            psmData.push({
+                name: document.getElementById(`psm_name_${i}`).value,
+                target: document.getElementById(`psm_target_${i}`).value,
+                actual: document.getElementById(`psm_actual_${i}`).value
+            });
+        }
+        localStorage.setItem('cc21_psm_table', JSON.stringify(psmData));
+    }
+
+    function clearData() {
+        if(confirm("Yakin ingin mereset semua data?")) {
+            localStorage.clear();
+            location.reload();
         }
     }
-};
 
-function saveData() {
-    localStorage.setItem('cc21_periode', document.getElementById('periode').value);
-    localStorage.setItem('cc21_shift', document.getElementById('shift').value);
-    localStorage.setItem('cc21_wh_am_ac', document.getElementById('wh_am_ac').value);
-    localStorage.setItem('cc21_toko', document.getElementById('toko').value);
-    localStorage.setItem('cc21_tf', document.getElementById('tf').value);
-    localStorage.setItem('cc21_actual', document.getElementById('actual').value);
-    localStorage.setItem('cc21_target_mtd', document.getElementById('target_mtd').value);
-    localStorage.setItem('cc21_target_tf', document.getElementById('target_tf').value);
-    localStorage.setItem('cc21_fokus', document.getElementById('fokus').value);
-    localStorage.setItem('cc21_new_member', document.getElementById('new_member').value);
-    localStorage.setItem('cc21_struk_input', document.getElementById('struk_input').value);
-    localStorage.setItem('cc21_psm', document.getElementById('psm').value);
-    localStorage.setItem('cc21_category', document.getElementById('category').value);
-    localStorage.setItem('cc21_ecommerce', document.getElementById('ecommerce').value);
-}
-
-function clearData() {
-    if(confirm("Yakin ingin mereset semua isian form?")) {
-        localStorage.clear();
-        location.reload();
+    function formatRupiah(angka) {
+        return Number(angka).toLocaleString('id-ID');
     }
-}
 
-function formatRupiah(angka) {
-    return Number(angka).toLocaleString('id-ID');
-}
+    function generateReport() {
+        saveAllData();
 
-function generateReport() {
-    saveData();
-    
-    let periode = document.getElementById('periode').value;
-    let shift = document.getElementById('shift').value;
-    let wh_am_ac = document.getElementById('wh_am_ac').value.split('/');
-    let toko = document.getElementById('toko').value.split('/');
-    
-    let wh = wh_am_ac[0] ? wh_am_ac[0].trim() : 'Bekasi';
-    let am = wh_am_ac[1] ? wh_am_ac[1].trim() : '';
-    let ac = wh_am_ac[2] ? wh_am_ac[2].trim() : '';
-    
-    let kd_toko = toko[0] ? toko[0].trim() : 'CC21';
-    let nama_toko = toko[1] ? toko[1].trim() : '';
+        let periode = document.getElementById('periode').value;
+        let shift = document.getElementById('shift').value;
+        let wh_am_ac = document.getElementById('wh_am_ac').value.split('/');
+        let toko = document.getElementById('toko').value.split('/');
 
-    let tf_str = document.getElementById('tf').value;
-    let actual = parseFloat(document.getElementById('actual').value.replace(/[^0-9]/g, '')) || 0;
-    let target_mtd = parseFloat(document.getElementById('target_mtd').value.replace(/[^0-9]/g, '')) || 0;
-    let target_tf = parseFloat(document.getElementById('target_tf').value.replace(/[^0-9]/g, '')) || 0;
-    
-    // Hitung otomatis Revenue MTD & TF ACHV
-    let ach_mtd = target_mtd > 0 ? ((actual / target_mtd) * 100).toFixed(2) + '%' : '0%';
-    let ach_tf = target_tf > 0 ? ((actual / target_tf) * 100).toFixed(2) + '%' : '0%';
-    
-    // Hitung GAP
-    let gap_mtd = target_mtd - actual;
-    let gap_tf = target_tf - actual;
+        let wh = wh_am_ac[0] ? wh_am_ac[0].trim() : 'Bekasi';
+        let am = wh_am_ac[1] ? wh_am_ac[1].trim() : '';
+        let ac = wh_am_ac[2] ? wh_am_ac[2].trim() : '';
 
-    // Hitung Struk Member Persen
-    let strukInput = document.getElementById('struk_input').value.split('/');
-    let jmlStrukMember = parseFloat(strukInput[0]) || 0;
-    let totalStruk = parseFloat(strukInput[1]) || 0;
-    let persentaseStruk = totalStruk > 0 ? Math.round((jmlStrukMember / totalStruk) * 100) + '%' : '0%';
-    let strukResultText = `${jmlStrukMember}/${totalStruk}/${persentaseStruk}`;
+        let kd_toko = toko[0] ? toko[0].trim() : 'CC21';
+        let nama_toko = toko[1] ? toko[1].trim() : '';
 
-    let fokus = document.getElementById('fokus').value;
-    let new_member = document.getElementById('new_member').value;
-    let psm = document.getElementById('psm').value;
-    let category = document.getElementById('category').value;
-    let ecommerce = document.getElementById('ecommerce').value;
+        let tf_str = document.getElementById('tf').value;
+        let actual = parseFloat(document.getElementById('actual').value.replace(/[^0-9]/g, '')) || 0;
+        let target_mtd = parseFloat(document.getElementById('target_mtd').value.replace(/[^0-9]/g, '')) || 0;
+        let target_tf = parseFloat(document.getElementById('target_tf').value.replace(/[^0-9]/g, '')) || 0;
 
-    let msg = `REPORT SALES HARIAN\n`;
-    msg += `PERIODE : ${periode}\n`;
-    msg += `WH : ${wh}\n`;
-    msg += `AM : ${am}\n`;
-    msg += `AC : ${ac}\n`;
-    msg += `KD Toko : ${kd_toko}\n`;
-    msg += `Nama Toko : ${nama_toko}\n`;
-    msg += `Shift : ${shift}\n`;
-    msg += `======================\n\n`;
-    
-    msg += `*REVENUE*\n`;
-    msg += `1. NET SALES\n`;
-    msg += `- Time factor: ${tf_str}\n`;
-    msg += `- TARGET MTD :Rp ${formatRupiah(target_mtd)}\n`;
-    msg += `- Target Time Factor: Rp ${formatRupiah(target_tf)}\n`;
-    msg += `- ACTUAL :Rp ${formatRupiah(actual)}\n`;
-    msg += `- ACHIVE MTD:${ach_mtd}\n`;
-    msg += `- AChieved Time Factor :${ach_tf}\n`;
-    msg += `- GAP TO TARGET :Rp ${formatRupiah(gap_mtd > 0 ? gap_mtd : 0)}\n`;
-    msg += `- GAP To Time Factor:Rp ${formatRupiah(gap_tf > 0 ? gap_tf : 0)}\n\n`;
+        // Perhitungan otomatis Revenue
+        let ach_mtd = target_mtd > 0 ? ((actual / target_mtd) * 100).toFixed(2) + '%' : '0%';
+        let ach_tf = target_tf > 0 ? ((actual / target_tf) * 100).toFixed(2) + '%' : '0%';
+        let gap_mtd = target_mtd - actual;
+        let gap_tf = target_tf - actual;
 
-    msg += `*FOKUS CABANG*\n`;
-    msg += `======================\n`;
-    msg += `TARGET/SALES/ACV%/ON HAND\n`;
-    
-    let fokusLines = fokus.split('\n');
-    fokusLines.forEach((line, idx) => {
-        let parts = line.split(':');
-        if(parts.length >= 2) {
-            let name = parts[0].trim();
-            let vals = parts[1].split('/').map(v => v.trim());
-            let target = parseFloat(vals[0]) || 0;
-            let sales = parseFloat(vals[1]) || 0;
-            let onhand = vals[2] ? vals[2] : '0';
+        // Perhitungan Member Struk
+        let sMember = parseFloat(document.getElementById('struk_member').value) || 0;
+        let tStruk = parseFloat(document.getElementById('total_struk').value) || 0;
+        let pStruk = tStruk > 0 ? Math.round((sMember / tStruk) * 100) + '%' : '0%';
+        let newMember = document.getElementById('new_member').value;
+
+        let msg = `REPORT SALES HARIAN\n`;
+        msg += `PERIODE : ${periode}\n`;
+        msg += `WH : ${wh}\n`;
+        msg += `AM : ${am}\n`;
+        msg += `AC : ${ac}\n`;
+        msg += `KD Toko : ${kd_toko}\n`;
+        msg += `Nama Toko : ${nama_toko}\n`;
+        msg += `Shift : ${shift}\n`;
+        msg += `======================\n\n`;
+
+        msg += `*REVENUE*\n`;
+        msg += `1. NET SALES\n`;
+        msg += `- Time factor: ${tf_str}\n`;
+        msg += `- TARGET MTD :Rp ${formatRupiah(target_mtd)}\n`;
+        msg += `- Target Time Factor: Rp ${formatRupiah(target_tf)}\n`;
+        msg += `- ACTUAL :Rp ${formatRupiah(actual)}\n`;
+        msg += `- ACHIVE MTD:${ach_mtd}\n`;
+        msg += `- AChieved Time Factor :${ach_tf}\n`;
+        msg += `- GAP TO TARGET :Rp ${formatRupiah(gap_mtd > 0 ? gap_mtd : 0)}\n`;
+        msg += `- GAP To Time Factor:Rp ${formatRupiah(gap_tf > 0 ? gap_tf : 0)}\n\n`;
+
+        msg += `*FOKUS CABANG*\n`;
+        msg += `======================\n`;
+        msg += `TARGET/SALES/ACV%/ON HAND\n`;
+
+        let savedFokus = JSON.parse(localStorage.getItem('cc21_fokus_table')) || defaultFokus;
+        savedFokus.forEach((item, idx) => {
+            let name = document.getElementById(`fokus_name_${idx}`).value;
+            let target = parseFloat(document.getElementById(`fokus_target_${idx}`).value) || 0;
+            let sales = parseFloat(document.getElementById(`fokus_sales_${idx}`).value) || 0;
+            let oh = document.getElementById(`fokus_oh_${idx}`).value;
             let acv = target > 0 ? Math.round((sales / target) * 100) + '%' : '0%';
-            msg += `${idx + 1}. ${name} : ${target}/${sales}/${acv}/${onhand}\n`;
-        } else {
-            msg += `${idx + 1}. ${line}\n`;
-        }
-    });
-    
-    msg += `======================\n`;
-    msg += `*MEMBER*\n`;
-    msg += `1. Actual NEW MEMBER :${new_member}\n`;
-    msg += `2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${strukResultText}\n`;
-    msg += `======================\n`;
-    
-    msg += `*PSM*(In Qty).\n`;
-    msg += `( Target - actual - %)\n`;
-    
-    let psmLines = psm.split('\n');
-    psmLines.forEach((line) => {
-        let parts = line.split(':');
-        if(parts.length >= 2) {
-            let name = parts[0].trim();
-            let vals = parts[1].split('/').map(v => v.trim());
-            let target = parseFloat(vals[0]) || 0;
-            let actualPsm = parseFloat(vals[1]) || 0;
+            msg += `${idx + 1}. ${name} : ${target}/${sales}/${acv}/${oh}\n`;
+        });
+
+        msg += `======================\n`;
+        msg += `*MEMBER*\n`;
+        msg += `1. Actual NEW MEMBER :${newMember}\n`;
+        msg += `2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${sMember}/${tStruk}/${pStruk}\n`;
+        msg += `======================\n`;
+
+        msg += `*PSM*(In Qty).\n`;
+        msg += `( Target - actual - %)\n`;
+
+        let savedPsm = JSON.parse(localStorage.getItem('cc21_psm_table')) || defaultPsm;
+        savedPsm.forEach((item, idx) => {
+            let name = document.getElementById(`psm_name_${idx}`).value;
+            let target = parseFloat(document.getElementById(`psm_target_${idx}`).value) || 0;
+            let actualPsm = parseFloat(document.getElementById(`psm_actual_${idx}`).value) || 0;
             let psmAcv = target > 0 ? Math.round((actualPsm / target) * 100) + '%' : '0%';
             msg += `${name} : ${target}/${actualPsm}/${psmAcv}\n`;
-        } else {
-            msg += `${line}\n`;
-        }
-    });
-    
-    msg += `======================\n`;
-    msg += `*CATEGORY* (Rupiah)\n`;
-    let catLines = category.split('\n');
-    catLines.forEach((line, idx) => {
-        msg += `${idx + 1}. ${line}\n`;
-    });
-    
-    msg += `======================\n`;
-    msg += `*E-COMMERCE*\n`;
-    msg += `1. FEE BASE (RP) : Rp ${ecommerce}\n\n`;
-    msg += `Terimakasih`;
+        });
 
-    localStorage.setItem('cc21_preview', msg);
+        let toysVal = document.getElementById('toys').value;
+        let hbplVal = document.getElementById('hbpl').value;
+        let ecomVal = document.getElementById('ecommerce').value;
 
-    document.getElementById('waPreview').innerText = msg;
-    document.getElementById('resultSection').style.display = 'block';
-
-    let encoded = encodeURIComponent(msg);
-    document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encoded}`;
-}
-</script>
-
-</body>
-    </html>
+        msg += `======================\n`;
+        msg += `*CATEGORY* (Rupiah)\n`;
+        msg += `1. TOYS (NS) : Rp ${toysVal}\n`;
+        msg += `2. HBPL (NS) : Rp ${hbplVal}\n`;
+        msg += `=========
