@@ -1,4 +1,84 @@
-cb    <!-- Member -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Sales Harian CC21 (Cloud Sync)</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 700px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #075e54; margin-bottom: 5px; font-size: 1.3rem; }
+        p.subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 5px; }
+        .status-bar { text-align: center; font-size: 0.75rem; padding: 5px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; background: #e3f2fd; color: #1565c0; }
+        .section { margin-bottom: 15px; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.85rem; color: #444; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; margin-bottom: 8px; background: #fff; }
+        .readonly-input { background-color: #e9ecef; cursor: not-allowed; color: #495057; font-weight: bold; }
+        .row-grid { display: flex; gap: 8px; }
+        .row-grid > div { flex: 1; }
+        table.input-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; background: #fff; border-radius: 6px; overflow: hidden; border: 1px solid #ddd; }
+        table.input-table th { background: #075e54; color: white; padding: 8px; text-align: center; font-size: 0.75rem; }
+        table.input-table td { padding: 6px; border-bottom: 1px solid #eee; }
+        table.input-table input { margin-bottom: 0; padding: 5px; font-size: 0.8rem; text-align: center; }
+        table.input-table input.item-name { text-align: left; }
+        .hint { font-size: 0.75rem; color: #666; font-style: italic; margin-top: 4px; display: block; }
+        button { background-color: #25d366; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.2s; }
+        button:hover { background-color: #128c7e; }
+        .preview-box { background: #e5ddd5; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #d4d4d4; }
+        .whatsapp-bubble { background: #ffffff; padding: 10px; border-radius: 8px; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; border-left: 4px solid #25d366; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-wa { background-color: #25d366; text-decoration: none; text-align: center; display: block; margin-top: 10px; padding: 12px; border-radius: 6px; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📋 Report Sales Harian CC21</h2>
+    <p class="subtitle">Tersinkronisasi Otomatis via Cloud ☁️</p>
+    <div id="cloudStatus" class="status-bar">🔄 Mengambil data dari cloud...</div>
+
+    <!-- Informasi Umum -->
+    <div class="section">
+        <label>⚙️ Informasi Umum</label>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Periode (Online):</label><input type="text" id="periode" class="readonly-input" readonly></div>
+            <div><label style="font-size:0.75rem;">Shift:</label><input type="text" id="shift" value="1" oninput="autoSave()"></div>
+        </div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">WH / AM / AC:</label><input type="text" id="wh_am_ac" value="Bekasi / Syahrul / Triyanto" oninput="autoSave()"></div>
+            <div><label style="font-size:0.75rem;">KD & Nama Toko:</label><input type="text" id="toko" value="CC21 / TOKO CC21 KUTN" oninput="autoSave()"></div>
+        </div>
+    </div>
+
+    <!-- Revenue -->
+    <div class="section">
+        <label>💰 REVENUE (Net Sales)</label>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Time Factor (%):</label><input type="text" id="tf" class="readonly-input" readonly></div>
+            <div><label style="font-size:0.75rem;">Actual (Rp):</label><input type="text" id="actual" value="0" oninput="autoSave()"></div>
+        </div>
+        <div class="row-grid">
+            <div><label style="font-size:0.75rem;">Target MTD (Rp):</label><input type="text" id="target_mtd" value="0" oninput="calcTargetTF()"></div>
+            <div><label style="font-size:0.75rem;">Target TF (Rp) Otomatis:</label><input type="text" id="target_tf" class="readonly-input" value="0" readonly></div>
+        </div>
+    </div>
+
+    <!-- Fokus Cabang -->
+    <div class="section">
+        <label>🎯 FOKUS CABANG</label>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th style="width:40%;">Nama Program</th>
+                    <th style="width:20%;">Target</th>
+                    <th style="width:20%;">Sales</th>
+                    <th style="width:20%;">OnHand</th>
+                </tr>
+            </thead>
+            <tbody id="fokusTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Member -->
     <div class="section">
         <label>👥 MEMBER & STRUK</label>
         <div class="row-grid">
@@ -45,12 +125,12 @@ cb    <!-- Member -->
 </div>
 
 <script>
-    // URL Google Apps Script yang sudah Anda buat
+    // URL Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuxWO81VcNigL1M3XfsRuYJHQJq03RFoKGhNBE1RrZ1TITCMivDQxSeibofYRlZVSKbg/exec';
 
     const defaultFokus = [
-        {name: "TEBUS MURAH", target: 20, sales: 0, onhand: 0},
-        {name: "SERBA GRATIS", target: 17, sales: 0, onhand: 0},
+        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, onhand: 0},
+        {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, onhand: 0},
         {name: "SEUUGER", target: 40, sales: 0, onhand: 0},
         {name: "PROMO CEBAN", target: 69, sales: 0, onhand: 0}
     ];
@@ -67,18 +147,40 @@ cb    <!-- Member -->
         {name: "Colagena", target: 55, actual: 0}
     ];
 
-    function getTodayDateString() {
-        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        const now = new Date();
-        return `${now.getDate()} ${months[now.getMonth()]}`;
-    }
-
     let saveTimeout;
 
     window.onload = async function() {
         renderTables(defaultFokus, defaultPsm);
+        setOnlineDateAndTF(); // Set Tanggal & TF Otomatis di awal
         await loadDataFromCloud();
     };
+
+    function setOnlineDateAndTF() {
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const now = new Date();
+        const d = now.getDate();
+        const m = now.getMonth();
+        const y = now.getFullYear();
+        
+        // 1. Set Tanggal Online
+        document.getElementById('periode').value = `${d} ${months[m]}`;
+        
+        // 2. Set Time Factor % Otomatis (Hari Ini / Total Hari Bulan Ini)
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const tfPercent = ((d / daysInMonth) * 100).toFixed(1);
+        document.getElementById('tf').value = `${tfPercent}%`;
+    }
+
+    function calcTargetTF() {
+        let targetMtd = parseFloat(document.getElementById('target_mtd').value.replace(/[^0-9]/g, '')) || 0;
+        let tfStr = document.getElementById('tf').value.replace('%', '');
+        let tfVal = parseFloat(tfStr) || 0;
+        
+        // 3. Set Target TF (Rp) Otomatis
+        let targetTf = Math.round(targetMtd * (tfVal / 100));
+        document.getElementById('target_tf').value = targetTf;
+        autoSave();
+    }
 
     function renderTables(fokusData, psmData) {
         let fokusHtml = '';
@@ -103,21 +205,18 @@ cb    <!-- Member -->
         document.getElementById('psmTableBody').innerHTML = psmHtml;
     }
 
-    // Ambil Data dari Cloud
     async function loadDataFromCloud() {
         try {
             const response = await fetch(SCRIPT_URL);
             const data = await response.json();
             
             if (data && Object.keys(data).length > 0) {
-                document.getElementById('periode').value = data.periode || getTodayDateString();
-                document.getElementById('shift').value = data.shift || '';
+                // Periode dan TF dilewati agar tetap menggunakan tanggal online hari ini
+                document.getElementById('shift').value = data.shift || '1';
                 document.getElementById('wh_am_ac').value = data.wh_am_ac || '';
                 document.getElementById('toko').value = data.toko || '';
-                document.getElementById('tf').value = data.tf || '';
                 document.getElementById('actual').value = data.actual || '';
                 document.getElementById('target_mtd').value = data.target_mtd || '';
-                document.getElementById('target_tf').value = data.target_tf || '';
                 document.getElementById('new_member').value = data.new_member || '';
                 document.getElementById('struk_member').value = data.struk_member || '';
                 document.getElementById('total_struk').value = data.total_struk || '';
@@ -128,26 +227,23 @@ cb    <!-- Member -->
                 if (data.fokus && data.psm) {
                     renderTables(data.fokus, data.psm);
                 }
-            } else {
-                document.getElementById('periode').value = getTodayDateString();
+
+                calcTargetTF(); // Hitung ulang Target TF setelah MTD ter-load
             }
             document.getElementById('cloudStatus').innerText = '✅ Data tersinkronisasi';
             document.getElementById('cloudStatus').style.background = '#e8f5e9';
             document.getElementById('cloudStatus').style.color = '#2e7d32';
         } catch (error) {
-            console.error('Error loading data:', error);
             document.getElementById('cloudStatus').innerText = '❌ Gagal memuat data cloud. Menampilkan default.';
             document.getElementById('cloudStatus').style.background = '#ffebee';
             document.getElementById('cloudStatus').style.color = '#c62828';
         }
     }
 
-    // Fitur auto-save otomatis setiap kali selesai mengetik (jeda 1.5 detik)
     function autoSave() {
         document.getElementById('cloudStatus').innerText = '⏳ Menyimpan ke cloud...';
         document.getElementById('cloudStatus').style.background = '#fff3e0';
         document.getElementById('cloudStatus').style.color = '#ef6c00';
-        
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(saveDataToCloud, 1500);
     }
@@ -170,7 +266,6 @@ cb    <!-- Member -->
                 actual: document.getElementById(`psm_actual_${i}`).value
             });
         }
-        
         return {
             periode: document.getElementById('periode').value,
             shift: document.getElementById('shift').value,
@@ -197,13 +292,12 @@ cb    <!-- Member -->
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify(data),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' } // Menggunakan text/plain untuk bypass preflight CORS
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
             });
             document.getElementById('cloudStatus').innerText = '✅ Tersimpan ke cloud';
             document.getElementById('cloudStatus').style.background = '#e8f5e9';
             document.getElementById('cloudStatus').style.color = '#2e7d32';
         } catch (error) {
-            console.error('Error saving data:', error);
             document.getElementById('cloudStatus').innerText = '❌ Gagal menyimpan ke cloud';
             document.getElementById('cloudStatus').style.background = '#ffebee';
             document.getElementById('cloudStatus').style.color = '#c62828';
@@ -215,17 +309,11 @@ cb    <!-- Member -->
     }
 
     function generateReport() {
-        autoSave(); // Panggil paksa save jika tombol ditekan
-        
+        autoSave();
         const data = gatherData();
         let wh_am_ac = data.wh_am_ac.split('/');
         let toko = data.toko.split('/');
-        let wh = wh_am_ac[0] ? wh_am_ac[0].trim() : '';
-        let am = wh_am_ac[1] ? wh_am_ac[1].trim() : '';
-        let ac = wh_am_ac[2] ? wh_am_ac[2].trim() : '';
-        let kd_toko = toko[0] ? toko[0].trim() : '';
-        let nama_toko = toko[1] ? toko[1].trim() : '';
-
+        
         let actual = parseFloat(data.actual.replace(/[^0-9]/g, '')) || 0;
         let target_mtd = parseFloat(data.target_mtd.replace(/[^0-9]/g, '')) || 0;
         let target_tf = parseFloat(data.target_tf.replace(/[^0-9]/g, '')) || 0;
@@ -237,9 +325,8 @@ cb    <!-- Member -->
         let tStruk = parseFloat(data.total_struk) || 0;
         let pStruk = tStruk > 0 ? Math.round((sMember / tStruk) * 100) + '%' : '0%';
 
-        let msg = `REPORT SALES HARIAN\n`;
-        msg += `PERIODE : ${data.periode}\nWH : ${wh}\nAM : ${am}\nAC : ${ac}\n`;
-        msg += `KD Toko : ${kd_toko}\nNama Toko : ${nama_toko}\nShift : ${data.shift}\n======================\n\n`;
+        let msg = `REPORT SALES HARIAN\nPERIODE : ${data.periode}\nWH : ${wh_am_ac[0]?.trim()||''}\nAM : ${wh_am_ac[1]?.trim()||''}\nAC : ${wh_am_ac[2]?.trim()||''}\n`;
+        msg += `KD Toko : ${toko[0]?.trim()||''}\nNama Toko : ${toko[1]?.trim()||''}\nShift : ${data.shift}\n======================\n\n`;
 
         msg += `*REVENUE*\n1. NET SALES\n- Time factor: ${data.tf}\n`;
         msg += `- TARGET MTD :Rp ${formatRupiah(target_mtd)}\n- Target Time Factor: Rp ${formatRupiah(target_tf)}\n`;
