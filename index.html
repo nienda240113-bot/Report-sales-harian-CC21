@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Sales Harian CC21</title>
+    <title>Report Sales Harian CC21 (Auto-Calc)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,8 +56,16 @@
             margin-bottom: 8px;
         }
         textarea {
-            height: 90px;
+            height: 110px;
             font-family: monospace;
+        }
+        .hint {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+            margin-top: -4px;
+            margin-bottom: 8px;
+            display: block;
         }
         button {
             background-color: #25d366;
@@ -113,8 +121,8 @@
 <body>
 
 <div class="container">
-    <h2>📋 Report Sales Harian CC21</h2>
-    <p class="subtitle">Data otomatis tersimpan & tidak hilang saat di-refresh</p>
+    <h2>📋 Report Sales Harian CC21 (Auto Calc)</h2>
+    <p class="subtitle">Persentase & GAP dihitung otomatis</p>
 
     <div class="section">
         <label>⚙️ Informasi Umum</label>
@@ -132,41 +140,45 @@
         <label>💰 REVENUE (Net Sales)</label>
         <div style="display: flex; gap: 10px;">
             <div style="flex:1;"><label style="font-size:0.75rem;">Time Factor (%):</label><input type="text" id="tf" value="87.1%" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Actual (Rp):</label><input type="text" id="actual" value="4.646.000" oninput="saveData()"></div>
+            <div style="flex:1;"><label style="font-size:0.75rem;">Actual (Rp):</label><input type="text" id="actual" value="4646000" oninput="saveData()"></div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label style="font-size:0.75rem;">Target MTD (Rp):</label><input type="text" id="target_mtd" value="345.059.891" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Target TF (Rp):</label><input type="text" id="target_tf" value="300.547.165" oninput="saveData()"></div>
+            <div style="flex:1;"><label style="font-size:0.75rem;">Target MTD (Rp):</label><input type="text" id="target_mtd" value="345059891" oninput="saveData()"></div>
+            <div style="flex:1;"><label style="font-size:0.75rem;">Target TF (Rp):</label><input type="text" id="target_tf" value="300547165" oninput="saveData()"></div>
         </div>
+        <span class="hint">*(Masukkan angka bersih tanpa titik/koma, misal: 4646000)*</span>
     </div>
 
     <div class="section">
-        <label>🎯 FOKUS CABANG (Format: Nama | Target/Sales/ACV%/OnHand)</label>
-        <textarea id="fokus" oninput="saveData()">TEBUS MURAH (QTY REDEEM) : 20/0/0%/0
-SERBA GRATIS (PAKET) : 17/0/0%/0
-SEUUGER : 40/0/0%/0
-PROMO CEBAN : 69/0/0%/0</textarea>
+        <label>🎯 FOKUS CABANG (Format: Nama : Target / Sales / OnHand)</label>
+        <span class="hint">ACV% akan dihitung otomatis. Contoh: TEBUS MURAH : 20 / 5 / 2</span>
+        <textarea id="fokus" oninput="saveData()">TEBUS MURAH (QTY REDEEM) : 20 / 0 / 0
+SERBA GRATIS (PAKET) : 17 / 0 / 0
+SEUUGER : 40 / 0 / 0
+PROMO CEBAN : 69 / 0 / 0</textarea>
     </div>
 
     <div class="section">
         <label>👥 MEMBER & STRUK</label>
         <div style="display: flex; gap: 10px;">
             <div style="flex:1;"><label style="font-size:0.75rem;">Actual New Member:</label><input type="text" id="new_member" value="0" oninput="saveData()"></div>
-            <div style="flex:1;"><label style="font-size:0.75rem;">Struk Member/Total:</label><input type="text" id="struk" value="47/69/68%" oninput="saveData()"></div>
+            <div style="flex:1;"><label style="font-size:0.75rem;">Struk Member / Total Struk:</label><input type="text" id="struk_input" value="47 / 69" placeholder="47 / 69" oninput="saveData()"></div>
         </div>
+        <span class="hint">*(Persentase struk member dihitung otomatis dari Struk Member dibagi Total Struk)*</span>
     </div>
 
     <div class="section">
-        <label>📦 PSM (Format: Nama : Target/Actual/%)</label>
-        <textarea id="psm" oninput="saveData()">Le mineral : 210/8/4%
-Nescafe : 75/6/8%
-Happy tos : 33/1/3%
-Sedaap : 66/10/15%
-Roma : 45/3/7%
-Rinso : 17/18/106%
-Kahf : 24/0/0%
-H&S : 12/0/0%
-Colagena : 55/0/0%</textarea>
+        <label>📦 PSM (Format: Nama : Target / Actual)</label>
+        <span class="hint">Persentase (%) dihitung otomatis. Contoh: Le mineral : 210 / 8</span>
+        <textarea id="psm" oninput="saveData()">Le mineral : 210 / 8
+Nescafe : 75 / 6
+Happy tos : 33 / 1
+Sedaap : 66 / 10
+Roma : 45 / 3
+Rinso : 17 / 18
+Kahf : 24 / 0
+H&S : 12 / 0
+Colagena : 55 / 0</textarea>
     </div>
 
     <div class="section">
@@ -177,7 +189,7 @@ Colagena : 55/0/0%</textarea>
         </div>
     </div>
 
-    <button onclick="generateReport()">⚡ Generate & Simpan Laporan</button>
+    <button onclick="generateReport()">⚡ Hitung & Buat Laporan</button>
     <button class="btn-clear" onclick="clearData()">🗑️ Reset Data</button>
 
     <div class="section" id="resultSection" style="display:none; background: #fff; margin-top: 15px;">
@@ -202,7 +214,7 @@ window.onload = function() {
         document.getElementById('target_tf').value = localStorage.getItem('cc21_target_tf');
         document.getElementById('fokus').value = localStorage.getItem('cc21_fokus');
         document.getElementById('new_member').value = localStorage.getItem('cc21_new_member');
-        document.getElementById('struk').value = localStorage.getItem('cc21_struk');
+        document.getElementById('struk_input').value = localStorage.getItem('cc21_struk_input');
         document.getElementById('psm').value = localStorage.getItem('cc21_psm');
         document.getElementById('category').value = localStorage.getItem('cc21_category');
         document.getElementById('ecommerce').value = localStorage.getItem('cc21_ecommerce');
@@ -227,7 +239,7 @@ function saveData() {
     localStorage.setItem('cc21_target_tf', document.getElementById('target_tf').value);
     localStorage.setItem('cc21_fokus', document.getElementById('fokus').value);
     localStorage.setItem('cc21_new_member', document.getElementById('new_member').value);
-    localStorage.setItem('cc21_struk', document.getElementById('struk').value);
+    localStorage.setItem('cc21_struk_input', document.getElementById('struk_input').value);
     localStorage.setItem('cc21_psm', document.getElementById('psm').value);
     localStorage.setItem('cc21_category', document.getElementById('category').value);
     localStorage.setItem('cc21_ecommerce', document.getElementById('ecommerce').value);
@@ -238,6 +250,10 @@ function clearData() {
         localStorage.clear();
         location.reload();
     }
+}
+
+function formatRupiah(angka) {
+    return Number(angka).toLocaleString('id-ID');
 }
 
 function generateReport() {
@@ -255,14 +271,28 @@ function generateReport() {
     let kd_toko = toko[0] ? toko[0].trim() : 'CC21';
     let nama_toko = toko[1] ? toko[1].trim() : '';
 
-    let tf = document.getElementById('tf').value;
-    let actual = document.getElementById('actual').value;
-    let target_mtd = document.getElementById('target_mtd').value;
-    let target_tf = document.getElementById('target_tf').value;
+    let tf_str = document.getElementById('tf').value;
+    let actual = parseFloat(document.getElementById('actual').value.replace(/[^0-9]/g, '')) || 0;
+    let target_mtd = parseFloat(document.getElementById('target_mtd').value.replace(/[^0-9]/g, '')) || 0;
+    let target_tf = parseFloat(document.getElementById('target_tf').value.replace(/[^0-9]/g, '')) || 0;
     
+    // Hitung otomatis Revenue MTD & TF ACHV
+    let ach_mtd = target_mtd > 0 ? ((actual / target_mtd) * 100).toFixed(2) + '%' : '0%';
+    let ach_tf = target_tf > 0 ? ((actual / target_tf) * 100).toFixed(2) + '%' : '0%';
+    
+    // Hitung GAP
+    let gap_mtd = target_mtd - actual;
+    let gap_tf = target_tf - actual;
+
+    // Hitung Struk Member Persen
+    let strukInput = document.getElementById('struk_input').value.split('/');
+    let jmlStrukMember = parseFloat(strukInput[0]) || 0;
+    let totalStruk = parseFloat(strukInput[1]) || 0;
+    let persentaseStruk = totalStruk > 0 ? Math.round((jmlStrukMember / totalStruk) * 100) + '%' : '0%';
+    let strukResultText = `${jmlStrukMember}/${totalStruk}/${persentaseStruk}`;
+
     let fokus = document.getElementById('fokus').value;
     let new_member = document.getElementById('new_member').value;
-    let struk = document.getElementById('struk').value;
     let psm = document.getElementById('psm').value;
     let category = document.getElementById('category').value;
     let ecommerce = document.getElementById('ecommerce').value;
@@ -279,32 +309,58 @@ function generateReport() {
     
     msg += `*REVENUE*\n`;
     msg += `1. NET SALES\n`;
-    msg += `- Time factor: ${tf}\n`;
-    msg += `- TARGET MTD :Rp ${target_mtd}\n`;
-    msg += `- Target Time Factor: Rp ${target_tf}\n`;
-    msg += `- ACTUAL :Rp ${actual}\n`;
-    msg += `- ACHIVE MTD:1.35%\n`;
-    msg += `- AChieved Time Factor :1.55%\n`;
-    msg += `- GAP TO TARGET :Rp 340.413.891\n`;
-    msg += `- GAP To Time Factor:Rp 295.901.165\n\n`;
+    msg += `- Time factor: ${tf_str}\n`;
+    msg += `- TARGET MTD :Rp ${formatRupiah(target_mtd)}\n`;
+    msg += `- Target Time Factor: Rp ${formatRupiah(target_tf)}\n`;
+    msg += `- ACTUAL :Rp ${formatRupiah(actual)}\n`;
+    msg += `- ACHIVE MTD:${ach_mtd}\n`;
+    msg += `- AChieved Time Factor :${ach_tf}\n`;
+    msg += `- GAP TO TARGET :Rp ${formatRupiah(gap_mtd > 0 ? gap_mtd : 0)}\n`;
+    msg += `- GAP To Time Factor:Rp ${formatRupiah(gap_tf > 0 ? gap_tf : 0)}\n\n`;
 
     msg += `*FOKUS CABANG*\n`;
     msg += `======================\n`;
     msg += `TARGET/SALES/ACV%/ON HAND\n`;
+    
     let fokusLines = fokus.split('\n');
     fokusLines.forEach((line, idx) => {
-        msg += `${idx + 1}. ${line}\n`;
+        let parts = line.split(':');
+        if(parts.length >= 2) {
+            let name = parts[0].trim();
+            let vals = parts[1].split('/').map(v => v.trim());
+            let target = parseFloat(vals[0]) || 0;
+            let sales = parseFloat(vals[1]) || 0;
+            let onhand = vals[2] ? vals[2] : '0';
+            let acv = target > 0 ? Math.round((sales / target) * 100) + '%' : '0%';
+            msg += `${idx + 1}. ${name} : ${target}/${sales}/${acv}/${onhand}\n`;
+        } else {
+            msg += `${idx + 1}. ${line}\n`;
+        }
     });
     
     msg += `======================\n`;
     msg += `*MEMBER*\n`;
     msg += `1. Actual NEW MEMBER :${new_member}\n`;
-    msg += `2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${struk}\n`;
+    msg += `2. Konstribusi atruk Member : ( Struk MEMBER : Total struk =${strukResultText}\n`;
     msg += `======================\n`;
     
     msg += `*PSM*(In Qty).\n`;
     msg += `( Target - actual - %)\n`;
-    msg += `${psm}\n`;
+    
+    let psmLines = psm.split('\n');
+    psmLines.forEach((line) => {
+        let parts = line.split(':');
+        if(parts.length >= 2) {
+            let name = parts[0].trim();
+            let vals = parts[1].split('/').map(v => v.trim());
+            let target = parseFloat(vals[0]) || 0;
+            let actualPsm = parseFloat(vals[1]) || 0;
+            let psmAcv = target > 0 ? Math.round((actualPsm / target) * 100) + '%' : '0%';
+            msg += `${name} : ${target}/${actualPsm}/${psmAcv}\n`;
+        } else {
+            msg += `${line}\n`;
+        }
+    });
     
     msg += `======================\n`;
     msg += `*CATEGORY* (Rupiah)\n`;
@@ -329,4 +385,4 @@ function generateReport() {
 </script>
 
 </body>
-</html>
+    </html>
