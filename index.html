@@ -49,7 +49,7 @@
         <div class="flex">
             <div><label>Periode (Otomatis)</label><input type="text" id="periode" readonly></div>
             <div><label>WH</label><input type="text" id="wh" value="Bekasi"></div>
-            <div><label>AM</label><input type="text" id="am" value="Syahrul"></div>
+            <div><label>AM</label><input type="text" id="am" value="SRD"></div>
         </div>
         <div class="flex">
             <div><label>AC</label><input type="text" id="ac" value="Triyanto"></div>
@@ -108,7 +108,7 @@
 </div>
 
 <script>
-    // URL Google Apps Script yang sudah terhubung
+    // URL Web App Google Apps Script Anda yang baru
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz-nb7k4bqk0TwuOok8wHai_bhpYbvHiqNkheZQT9eqKgBbcUmoVh_BKejqqd_qRxRA/exec";
 
     // Set Tanggal & Time Factor Otomatis
@@ -184,7 +184,7 @@
         return "Rp " + Math.round(angka).toLocaleString('id-ID').replace(/,/g, ".");
     }
 
-    // --- FUNGSI CLOUD SYNC ---
+    // --- FUNGSI CLOUD SYNC (JSONP & Form Submit Aman CORS) ---
     function saveDataToCloud() {
         document.getElementById('loading').style.display = 'block';
 
@@ -223,28 +223,53 @@
             });
         });
 
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(() => {
+        let jsonData = JSON.stringify(data);
+        
+        // Menggunakan form tersembunyi agar tidak kena error CORS di browser HP
+        let form = document.createElement('form');
+        form.action = WEB_APP_URL;
+        form.method = 'POST';
+        form.target = 'hidden_iframe';
+
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = jsonData;
+        form.appendChild(input);
+
+        let iframe = document.getElementById('hidden_iframe');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.name = 'hidden_iframe';
+            iframe.id = 'hidden_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
-            alert("Data berhasil disimpan ke Cloud! Perangkat lain dapat mengambil data ini.");
-        }).catch(err => {
-            document.getElementById('loading').style.display = 'none';
-            alert("Gagal menyimpan: " + err);
-        });
+            alert("Data berhasil disimpan ke Cloud!");
+        }, 1200);
     }
 
     function loadDataFromCloud() {
         document.getElementById('loading').style.display = 'block';
 
-        fetch(WEB_APP_URL)
-        .then(response => response.json())
-        .then(data => {
+        // Menggunakan JSONP untuk bypass CORS
+        let callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
             document.getElementById('loading').style.display = 'none';
-            if(!data) return;
+            delete window[callbackName];
+            document.body.removeChild(script);
+
+            if(!data || Object.keys(data).length === 0) {
+                alert("Data cloud masih kosong.");
+                return;
+            }
 
             document.getElementById('wh').value = data.wh || '';
             document.getElementById('am').value = data.am || '';
@@ -272,10 +297,15 @@
             }
 
             alert("Data terbaru berhasil dimuat dari Cloud!");
-        }).catch(err => {
+        };
+
+        let script = document.createElement('script');
+        script.src = `${WEB_APP_URL}?callback=${callbackName}`;
+        script.onerror = function() {
             document.getElementById('loading').style.display = 'none';
-            alert("Gagal memuat data: " + err);
-        });
+            alert("Gagal memuat data dari Cloud. Pastikan koneksi internet stabil.");
+        };
+        document.body.appendChild(script);
     }
 
     function generateReport() {
