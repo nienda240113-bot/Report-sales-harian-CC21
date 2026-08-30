@@ -277,20 +277,20 @@
     window.onload = function() {
         loadTableData();
         if(localStorage.getItem('cc21_periode')) {
-            document.getElementById('periode').value = localStorage.getItem('cc21_periode');
-            document.getElementById('shift').value = localStorage.getItem('cc21_shift');
-            document.getElementById('wh_am_ac').value = localStorage.getItem('cc21_wh_am_ac');
-            document.getElementById('toko').value = localStorage.getItem('cc21_toko');
-            document.getElementById('tf').value = localStorage.getItem('cc21_tf');
-            document.getElementById('actual').value = localStorage.getItem('cc21_actual');
-            document.getElementById('target_mtd').value = localStorage.getItem('cc21_target_mtd');
-            document.getElementById('target_tf').value = localStorage.getItem('cc21_target_tf');
-            document.getElementById('new_member').value = localStorage.getItem('cc21_new_member');
-            document.getElementById('struk_member').value = localStorage.getItem('cc21_struk_member');
-            document.getElementById('total_struk').value = localStorage.getItem('cc21_total_struk');
-            document.getElementById('toys').value = localStorage.getItem('cc21_toys');
-            document.getElementById('hbpl').value = localStorage.getItem('cc21_hbpl');
-            document.getElementById('ecommerce').value = localStorage.getItem('cc21_ecommerce');
+            document.getElementById('periode').value = localStorage.getItem('cc21_periode') || '';
+            document.getElementById('shift').value = localStorage.getItem('cc21_shift') || '';
+            document.getElementById('wh_am_ac').value = localStorage.getItem('cc21_wh_am_ac') || '';
+            document.getElementById('toko').value = localStorage.getItem('cc21_toko') || '';
+            document.getElementById('tf').value = localStorage.getItem('cc21_tf') || '';
+            document.getElementById('actual').value = localStorage.getItem('cc21_actual') || '';
+            document.getElementById('target_mtd').value = localStorage.getItem('cc21_target_mtd') || '';
+            document.getElementById('target_tf').value = localStorage.getItem('cc21_target_tf') || '';
+            document.getElementById('new_member').value = localStorage.getItem('cc21_new_member') || '';
+            document.getElementById('struk_member').value = localStorage.getItem('cc21_struk_member') || '';
+            document.getElementById('total_struk').value = localStorage.getItem('cc21_total_struk') || '';
+            document.getElementById('toys').value = localStorage.getItem('cc21_toys') || '';
+            document.getElementById('hbpl').value = localStorage.getItem('cc21_hbpl') || '';
+            document.getElementById('ecommerce').value = localStorage.getItem('cc21_ecommerce') || '';
             
             if(localStorage.getItem('cc21_preview')) {
                 document.getElementById('waPreview').innerText = localStorage.getItem('cc21_preview');
@@ -399,13 +399,11 @@
         let target_mtd = parseFloat(document.getElementById('target_mtd').value.replace(/[^0-9]/g, '')) || 0;
         let target_tf = parseFloat(document.getElementById('target_tf').value.replace(/[^0-9]/g, '')) || 0;
 
-        // Perhitungan otomatis Revenue
         let ach_mtd = target_mtd > 0 ? ((actual / target_mtd) * 100).toFixed(2) + '%' : '0%';
         let ach_tf = target_tf > 0 ? ((actual / target_tf) * 100).toFixed(2) + '%' : '0%';
         let gap_mtd = target_mtd - actual;
         let gap_tf = target_tf - actual;
 
-        // Perhitungan Member Struk
         let sMember = parseFloat(document.getElementById('struk_member').value) || 0;
         let tStruk = parseFloat(document.getElementById('total_struk').value) || 0;
         let pStruk = tStruk > 0 ? Math.round((sMember / tStruk) * 100) + '%' : '0%';
@@ -472,4 +470,4 @@
         msg += `*CATEGORY* (Rupiah)\n`;
         msg += `1. TOYS (NS) : Rp ${toysVal}\n`;
         msg += `2. HBPL (NS) : Rp ${hbplVal}\n`;
-        msg += `=========
+        msg += `=
