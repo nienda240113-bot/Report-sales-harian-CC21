@@ -228,7 +228,7 @@
                 <!-- Diisi otomatis oleh JavaScript -->
             </tbody>
         </table>
-        <span class="hint">Persentase (%) PSM dihitung otomatis.</span>
+        <span class="hint">Persentase (%) PSM dihitung otomatis. Nama item bisa diubah manual.</span>
     </div>
 
     <!-- Category & E-Commerce -->
@@ -242,7 +242,7 @@
     </div>
 
     <button onclick="generateReport()">⚡ Hitung & Buat Laporan WhatsApp</button>
-    <button class="btn-clear" onclick="clearData()">🗑️ Reset Data</button>
+    <button class="btn-clear" onclick="clearData()">🗑️ Reset Data ke Default</button>
 
     <div class="section" id="resultSection" style="display:none; background: #fff; margin-top: 15px;">
         <label>💬 Preview Pesan WhatsApp:</label>
@@ -254,7 +254,7 @@
 </div>
 
 <script>
-    // Data default Fokus Cabang & PSM
+    // Data default Fokus Cabang sesuai permintaan
     const defaultFokus = [
         {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, onhand: 0},
         {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, onhand: 0},
@@ -262,6 +262,7 @@
         {name: "PROMO CEBAN", target: 69, sales: 0, onhand: 0}
     ];
 
+    // Data default PSM sesuai permintaan
     const defaultPsm = [
         {name: "Le mineral", target: 210, actual: 8},
         {name: "Nescafe", target: 75, actual: 6},
@@ -369,7 +370,7 @@
     }
 
     function clearData() {
-        if(confirm("Yakin ingin mereset semua data?")) {
+        if(confirm("Yakin ingin mereset semua data ke pengaturan awal?")) {
             localStorage.clear();
             location.reload();
         }
@@ -441,7 +442,7 @@
             let sales = parseFloat(document.getElementById(`fokus_sales_${idx}`).value) || 0;
             let oh = document.getElementById(`fokus_oh_${idx}`).value;
             let acv = target > 0 ? Math.round((sales / target) * 100) + '%' : '0%';
-            msg += `${idx + 1}. ${name} : ${target}/${sales}/${acv}/${oh}\n`;
+            msg += `${idx + 1}. ${name} :${target}/${sales}/${acv}/${oh}\n`;
         });
 
         msg += `======================\n`;
@@ -470,4 +471,20 @@
         msg += `*CATEGORY* (Rupiah)\n`;
         msg += `1. TOYS (NS) : Rp ${toysVal}\n`;
         msg += `2. HBPL (NS) : Rp ${hbplVal}\n`;
-        msg += `=
+        msg += `======================\n`;
+        msg += `*E-COMMERCE*\n`;
+        msg += `1. FEE BASE (RP) : Rp ${ecomVal}\n\n`;
+        msg += `Terimakasih`;
+
+        localStorage.setItem('cc21_preview', msg);
+
+        document.getElementById('waPreview').innerText = msg;
+        document.getElementById('resultSection').style.display = 'block';
+
+        let encoded = encodeURIComponent(msg);
+        document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encoded}`;
+    }
+</script>
+
+</body>
+</html>
