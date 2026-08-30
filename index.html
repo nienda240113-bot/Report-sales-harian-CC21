@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Report Sales Harian</title>
+    <title>Aplikasi Report Sales Harian (Cloud Sync)</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 15px; background-color: #f4f4f9; margin: 0; }
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -13,31 +13,37 @@
         label { display: block; font-weight: bold; margin-top: 8px; font-size: 12px; color: #555; }
         input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         
-        /* Kolom yang tidak bisa diedit */
         input[readonly] { background-color: #e9ecef; color: #333; cursor: not-allowed; font-weight: bold; text-align: center; }
         .readonly-tf { background-color: #e2f0d9 !important; color: #28a745 !important; }
 
         .flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .flex > div { flex: 1; min-width: 100px; }
         
-        /* Layout Item Row (Fokus Cabang & PSM) */
         .item-row { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 8px; flex-wrap: nowrap; background: #fafafa; padding: 8px; border-radius: 6px; border: 1px solid #eee; overflow-x: auto;}
         .item-row > div { flex: 1; min-width: 60px; }
         .item-row > div.name-field { flex: 2; min-width: 120px; }
         .item-row > div.btn-field { flex: 0 0 35px; min-width: 35px; }
 
-        button { background-color: #28a745; color: white; border: none; padding: 12px 15px; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 14px; font-weight: bold; }
-        button.add { background-color: #007bff; font-size: 12px; padding: 6px 12px; margin-top: 5px; }
+        button { background-color: #28a745; color: white; border: none; padding: 12px 15px; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 14px; font-weight: bold; width: 100%; }
+        button.add { background-color: #007bff; font-size: 12px; padding: 6px 12px; margin-top: 5px; width: auto; }
         button.del { background-color: #dc3545; padding: 8px; width: 100%; margin-top: 0; font-weight: bold; }
+        button.sync { background-color: #ffc107; color: #333; margin-bottom: 10px; }
         button:hover { opacity: 0.9; }
         textarea { width: 100%; height: 380px; margin-top: 10px; padding: 10px; font-family: monospace; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; font-size: 13px; }
+        
+        #loading { display: none; text-align: center; color: #007bff; font-weight: bold; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Form Report Sales Harian</h2>
+    <div id="loading">Sedang memuat / menyimpan data ke server...</div>
     
+    <!-- TOMBOL SYNC / CLOUD -->
+    <button class="sync" onclick="loadDataFromCloud()">📥 Ambil Data Terbaru dari Cloud</button>
+    <button onclick="saveDataToCloud()" style="background-color: #6610f2; margin-bottom: 15px;">☁️ Simpan Data ke Cloud (Semua Perangkat)</button>
+
     <div class="section">
         <h3>1. Data Toko</h3>
         <div class="flex">
@@ -92,48 +98,38 @@
         </div>
     </div>
 
-    <button onclick="generateReport()" style="width: 100%; font-size: 16px;">Generate & Hitung Otomatis</button>
+    <button onclick="generateReport()">Generate & Hitung Otomatis</button>
 
     <div class="section" style="border: none;">
         <h3>Hasil Report (Siap Copy ke WA)</h3>
         <textarea id="output" readonly></textarea>
-        <button onclick="copyText()" style="background-color: #17a2b8; width: 100%;">Copy Text</button>
+        <button onclick="copyText()" style="background-color: #17a2b8;">Copy Text</button>
     </div>
 </div>
 
 <script>
-    // 1. Set Tanggal Otomatis & Time Factor Otomatis
+    // URL Google Apps Script yang sudah terhubung
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz-nb7k4bqk0TwuOok8wHai_bhpYbvHiqNkheZQT9eqKgBbcUmoVh_BKejqqd_qRxRA/exec";
+
+    // Set Tanggal & Time Factor Otomatis
     const today = new Date();
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    
     const tanggal = today.getDate();
-    const bulan = today.getMonth(); // 0 s.d 11
+    const bulan = today.getMonth();
     const tahun = today.getFullYear();
     
-    // Tampilkan di Periode
     document.getElementById('periode').value = `${tanggal} ${namaBulan[bulan]}`;
-
-    // Hitung total hari di bulan ini (Time Factor)
     const totalHariBulanIni = new Date(tahun, bulan + 1, 0).getDate();
-    const tf_otomatis = ((tanggal / totalHariBulanIni) * 100).toFixed(1); // 1 angka di belakang koma
-    document.getElementById('tf_pct').value = tf_otomatis;
+    document.getElementById('tf_pct').value = ((tanggal / totalHariBulanIni) * 100).toFixed(1);
 
-
-    // 2. Fungsi Kalkulator Persen di Layar
     function hitungPersenLayar(element) {
         let row = element.parentElement.parentElement;
         let target = parseInt(row.querySelector('.inp-target').value) || 0;
         let actual = parseInt(row.querySelector('.inp-actual').value) || 0;
         let outputPct = row.querySelector('.out-pct');
-        
-        if(target === 0) {
-            outputPct.value = "0%";
-        } else {
-            outputPct.value = Math.round((actual / target) * 100) + "%";
-        }
+        outputPct.value = target === 0 ? "0%" : Math.round((actual / target) * 100) + "%";
     }
 
-    // Data Default Fokus Cabang
     const initialFC = [
         {name: "TEBUS MURAH (QTY REDEEM)", target: 20, actual: 0},
         {name: "SERBA GRATIS (PAKET)", target: 17, actual: 0},
@@ -141,7 +137,6 @@
         {name: "PROMO CEBAN", target: 69, actual: 0}
     ];
 
-    // Data Default PSM
     const initialPSM = [
         {name: "Le mineral", target: 210, actual: 8},
         {name: "Nescafe", target: 75, actual: 6},
@@ -189,6 +184,100 @@
         return "Rp " + Math.round(angka).toLocaleString('id-ID').replace(/,/g, ".");
     }
 
+    // --- FUNGSI CLOUD SYNC ---
+    function saveDataToCloud() {
+        document.getElementById('loading').style.display = 'block';
+
+        let data = {
+            wh: document.getElementById('wh').value,
+            am: document.getElementById('am').value,
+            ac: document.getElementById('ac').value,
+            kd: document.getElementById('kd').value,
+            nama: document.getElementById('nama').value,
+            shift: document.getElementById('shift').value,
+            target_mtd: document.getElementById('target_mtd').value,
+            actual_mtd: document.getElementById('actual_mtd').value,
+            new_member: document.getElementById('new_member').value,
+            struk_member: document.getElementById('struk_member').value,
+            total_struk: document.getElementById('total_struk').value,
+            toys: document.getElementById('toys').value,
+            hbpl: document.getElementById('hbpl').value,
+            ecomm: document.getElementById('ecomm').value,
+            fc: [],
+            psm: []
+        };
+
+        document.querySelectorAll('.fc-row').forEach(row => {
+            data.fc.push({
+                name: row.querySelector('.fc_name').value,
+                target: row.querySelector('.fc_target').value,
+                actual: row.querySelector('.fc_actual').value
+            });
+        });
+
+        document.querySelectorAll('.psm-row').forEach(row => {
+            data.psm.push({
+                name: row.querySelector('.psm_name').value,
+                target: row.querySelector('.psm_target').value,
+                actual: row.querySelector('.psm_actual').value
+            });
+        });
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(() => {
+            document.getElementById('loading').style.display = 'none';
+            alert("Data berhasil disimpan ke Cloud! Perangkat lain dapat mengambil data ini.");
+        }).catch(err => {
+            document.getElementById('loading').style.display = 'none';
+            alert("Gagal menyimpan: " + err);
+        });
+    }
+
+    function loadDataFromCloud() {
+        document.getElementById('loading').style.display = 'block';
+
+        fetch(WEB_APP_URL)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if(!data) return;
+
+            document.getElementById('wh').value = data.wh || '';
+            document.getElementById('am').value = data.am || '';
+            document.getElementById('ac').value = data.ac || '';
+            document.getElementById('kd').value = data.kd || '';
+            document.getElementById('nama').value = data.nama || '';
+            document.getElementById('shift').value = data.shift || '';
+            document.getElementById('target_mtd').value = data.target_mtd || 0;
+            document.getElementById('actual_mtd').value = data.actual_mtd || 0;
+            document.getElementById('new_member').value = data.new_member || 0;
+            document.getElementById('struk_member').value = data.struk_member || 0;
+            document.getElementById('total_struk').value = data.total_struk || 0;
+            document.getElementById('toys').value = data.toys || 0;
+            document.getElementById('hbpl').value = data.hbpl || 0;
+            document.getElementById('ecomm').value = data.ecomm || 0;
+
+            if(data.fc && data.fc.length > 0) {
+                document.getElementById('fc_container').innerHTML = '';
+                data.fc.forEach(f => addFC(f.name, f.target, f.actual));
+            }
+
+            if(data.psm && data.psm.length > 0) {
+                document.getElementById('psm_container').innerHTML = '';
+                data.psm.forEach(p => addPSM(p.name, p.target, p.actual));
+            }
+
+            alert("Data terbaru berhasil dimuat dari Cloud!");
+        }).catch(err => {
+            document.getElementById('loading').style.display = 'none';
+            alert("Gagal memuat data: " + err);
+        });
+    }
+
     function generateReport() {
         let tf_pct = parseFloat(document.getElementById('tf_pct').value) || 0;
         let target_mtd = parseFloat(document.getElementById('target_mtd').value) || 0;
@@ -233,14 +322,12 @@
             let t = parseInt(row.querySelector('.fc_target').value) || 0;
             let a = parseInt(row.querySelector('.fc_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            // Mengubah format koma menjadi garis miring (/)
             if(n.trim() !== '') report += `${idx + 1}. ${n} : ${t} / ${a} / ${p}%\n`;
         });
         report += `======================\n`;
 
         report += `*MEMBER*\n`;
         report += `1. Actual NEW MEMBER :${document.getElementById('new_member').value}\n`;
-        // Mengubah format koma menjadi garis miring (/)
         report += `2. Konstribusi struk Member : ( Struk MEMBER : Total struk = ${str_member} / ${tot_struk} / ${pct_member}%\n`;
         report += `======================\n`;
 
@@ -251,7 +338,6 @@
             let t = parseInt(row.querySelector('.psm_target').value) || 0;
             let a = parseInt(row.querySelector('.psm_actual').value) || 0;
             let p = t === 0 ? 0 : Math.round((a / t) * 100);
-            // Mengubah format koma menjadi garis miring (/)
             if(n.trim() !== '') report += `${n} : ${t} / ${a} / ${p}%\n`;
         });
         report += `======================\n`;
