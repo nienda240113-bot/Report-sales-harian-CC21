@@ -231,7 +231,6 @@
                 document.getElementById('shift').value = data.shift || '1';
                 document.getElementById('wh_am_ac').value = data.wh_am_ac || '';
                 
-                // Memastikan data toko dari cloud dimuat (jika ada), jika kosong pakai default
                 if (data.toko) {
                     document.getElementById('toko').value = data.toko;
                 }
@@ -373,12 +372,14 @@
         });
 
         msg += `======================\n*CATEGORY* (Rupiah)\n1. TOYS (NS) : Rp ${data.toys}\n2. HBPL (NS) : Rp ${data.hbpl}\n`;
-        msg += `======================\n*E-COMMERCE*\n1. FEE BASE (RP) : Rp ${data.ecommerce}\n\nTerimakasih`;
 
         document.getElementById('waPreview').innerText = msg;
         document.getElementById('resultSection').style.display = 'block';
-        document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        
+        let encodedMsg = encodeURIComponent(msg);
+        document.getElementById('sendWaBtn').href = `https://api.whatsapp.com/send?text=${encodedMsg}`;
     }
 </script>
+
 </body>
 </html>
