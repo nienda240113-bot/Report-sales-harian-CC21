@@ -78,7 +78,7 @@
                     <th style="width:40%;">Nama Program</th>
                     <th style="width:20%;">Target</th>
                     <th style="width:20%;">Sales</th>
-                    <th style="width:20%;">OnHand</th>
+                    <th style="width:20%;">Persen (%)</th>
                 </tr>
             </thead>
             <tbody id="fokusTableBody"></tbody>
@@ -135,10 +135,10 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuxWO81VcNigL1M3XfsRuYJHQJq03RFoKGhNBE1RrZ1TITCMivDQxSeibofYRlZVSKbg/exec';
 
     const defaultFokus = [
-        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, onhand: 0},
-        {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, onhand: 0},
-        {name: "SEUUGER", target: 40, sales: 0, onhand: 0},
-        {name: "PROMO CEBAN", target: 69, sales: 0, onhand: 0}
+        {name: "TEBUS MURAH (QTY REDEEM)", target: 20, sales: 0, persen: 0},
+        {name: "SERBA GRATIS (PAKET)", target: 17, sales: 0, persen: 0},
+        {name: "SEUUGER", target: 40, sales: 0, persen: 0},
+        {name: "PROMO CEBAN", target: 69, sales: 0, persen: 0}
     ];
 
     const defaultPsm = [
@@ -202,11 +202,12 @@
     function renderTables(fokusData, psmData) {
         let fokusHtml = '';
         fokusData.forEach((item, idx) => {
+            let persenVal = item.persen !== undefined ? item.persen : (item.onhand !== undefined ? item.onhand : 0);
             fokusHtml += `<tr>
                 <td><input type="text" class="item-name" id="fokus_name_${idx}" value="${item.name}" oninput="autoSave()"></td>
                 <td><input type="number" id="fokus_target_${idx}" value="${item.target}" oninput="autoSave()"></td>
                 <td><input type="number" id="fokus_sales_${idx}" value="${item.sales}" oninput="autoSave()"></td>
-                <td><input type="number" id="fokus_oh_${idx}" value="${item.onhand}" oninput="autoSave()"></td>
+                <td><input type="number" id="fokus_persen_${idx}" value="${persenVal}" oninput="autoSave()"></td>
             </tr>`;
         });
         document.getElementById('fokusTableBody').innerHTML = fokusHtml;
@@ -275,7 +276,7 @@
                 name: document.getElementById(`fokus_name_${i}`).value,
                 target: document.getElementById(`fokus_target_${i}`).value,
                 sales: document.getElementById(`fokus_sales_${i}`).value,
-                onhand: document.getElementById(`fokus_oh_${i}`).value
+                persen: document.getElementById(`fokus_persen_${i}`).value
             });
         }
         let psmData = [];
@@ -352,12 +353,13 @@
         msg += `- GAP TO TARGET :Rp ${gap_target}\n`;
         msg += `- GAP To Time Factor:Rp ${gap_tf}\n\n`;
 
-        msg += `*FOKUS CABANG*\n======================\nTARGET/SALES/ACV%/ON HAND\n`;
+        msg += `*FOKUS CABANG*\n======================\nTARGET/SALES/ACV%/PERSEN\n`;
         data.fokus.forEach((item, idx) => {
             let target = parseFloat(item.target) || 0;
             let sales = parseFloat(item.sales) || 0;
             let acv = target > 0 ? Math.round((sales / target) * 100) + '%' : '0%';
-            msg += `${idx + 1}. ${item.name} :${target}/${sales}/${acv}/${item.onhand}\n`;
+            let persenStr = item.persen ? `${item.persen}%` : '0%';
+            msg += `${idx + 1}. ${item.name} :${target}/${sales}/${acv}/${persenStr}\n`;
         });
 
         msg += `======================\n*MEMBER*\n1. Actual NEW MEMBER :${data.new_member}\n`;
